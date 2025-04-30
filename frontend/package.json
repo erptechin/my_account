@@ -6,7 +6,7 @@
   "scripts": {
     "dev": "vite",
     "build": "vite build && yarn copy-html-entry",
-    "copy-html-entry": "cp -r dist ../erptech_ads/public && cp -r ../erptech_ads/public/dist/index.html ../erptech_ads/www/brands.html && rm -r ../erptech_ads/public/dist/index.html",
+    "copy-html-entry": "cp -r dist ../my_account/public && cp -r ../my_account/public/dist/index.html ../my_account/www/smartcourt.html && rm -r ../my_account/public/dist/index.html",
     "lint": "eslint .",
     "preview": "vite preview"
   },

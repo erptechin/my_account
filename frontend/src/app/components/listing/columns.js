@@ -71,6 +71,15 @@ export function Columns(fields = []) {
                 filterFn: "equalsString",
             }))
         }
+
+        // Check
+        if (item.fieldtype == 'Date') {
+            returnColumns.push(columnHelper.accessor((row) => row[item.fieldname], {
+                id: item.fieldname,
+                label: item.label,
+                header: item.label,
+            }))
+        }
     }
 
     returnColumns.push(columnHelper.display({

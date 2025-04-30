@@ -39,35 +39,35 @@ export const showError = (error) => {
 
 export const signUp = async (body) => {
   body['company'] = company
-  const response = await axiosInstance.post(`method/erptech_ads.api.auth.sign_up`, body);
+  const response = await axiosInstance.post(`method/product_ui.api.auth.sign_up`, body);
   return response.data;
 };
 
 export const forgotPassword = async (body) => {
-  const response = await axiosInstance.post(`method/erptech_ads.api.auth.forgot_password`, body);
+  const response = await axiosInstance.post(`method/product_ui.api.auth.forgot_password`, body);
   return response.data;
 };
 
 export const resetPassword = async (body) => {
-  const response = await axiosInstance.post(`method/erptech_ads.api.auth.reset_password`, body);
+  const response = await axiosInstance.post(`method/product_ui.api.auth.reset_password`, body);
   return response.data;
 };
 
 export const loginApi = async (params) => {
   params['company'] = company
-  const response = await axiosInstance.get(`method/erptech_ads.api.auth.login`, { params });
+  const response = await axiosInstance.get(`method/product_ui.api.auth.login`, { params });
   return response.data;
 };
 
 export const fetchProfile = async () => {
   await getAuthorizationToken()
-  const response = await axiosInstance.get(`method/erptech_ads.api.auth.profile`);
+  const response = await axiosInstance.get(`method/product_ui.api.auth.profile`);
   return response.data;
 };
 
 export const updProfile = async (body) => {
   await getAuthorizationToken()
-  const response = await axiosInstance.post(`method/erptech_ads.api.auth.upd_profile`, body);
+  const response = await axiosInstance.post(`method/product_ui.api.auth.update_profile`, body);
   return response.data;
 };
 
@@ -78,25 +78,25 @@ export const logOut = async () => {
 
 export const changePassword = async (body) => {
   await getAuthorizationToken()
-  const response = await axiosInstance.post(`method/erptech_ads.api.auth.change_password`, body);
+  const response = await axiosInstance.post(`method/product_ui.api.auth.change_password`, body);
   return response.data;
 };
 
 export const getInfo = async (params) => {
   await getAuthorizationToken()
-  const response = await axiosInstance.get(`method/erptech_ads.api.doctype.list_info`, { params });
+  const response = await axiosInstance.get(`method/product_ui.api.doctype.list_info`, { params });
   return response?.data?.data
 };
 
 export const getListData = async (params) => {
   await getAuthorizationToken()
-  const response = await axiosInstance.get(`method/erptech_ads.api.doctype.list_data`, { params });
+  const response = await axiosInstance.get(`method/product_ui.api.doctype.list_data`, { params });
   return response?.data?.data
 };
 
 export const getSingleData = async (params) => {
   await getAuthorizationToken()
-  const response = await axiosInstance.get(`method/erptech_ads.api.doctype.single_data`, { params })
+  const response = await axiosInstance.get(`method/product_ui.api.doctype.single_data`, { params })
   return response?.data?.data?.data ?? {};
 };
 
@@ -114,7 +114,7 @@ export const updateData = async (params) => {
 
 export const deleteData = async (body) => {
   await getAuthorizationToken()
-  const response = await axiosInstance.post(`method/erptech_ads.api.doctype.delete_data`, body);
+  const response = await axiosInstance.post(`method/product_ui.api.doctype.delete_data`, body);
   return response.data;
 };
 

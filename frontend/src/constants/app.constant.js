@@ -1,5 +1,5 @@
-export const APP_NAME = "ERP TECH";
-export const APP_KEY = "erptech";
+export const APP_NAME = "SMART COURT";
+export const APP_KEY = "smart-court";
 
 // Redirect Paths
 export const REDIRECT_URL_KEY = "redirect";

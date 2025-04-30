@@ -34,186 +34,125 @@ const protectedRoutes = {
               }),
             },
             {
-              path: "brand",
+              path: "charge-entry",
               lazy: async () => ({
-                Component: (await import("app/pages/dashboards/brand"))
+                Component: (await import("app/pages/dashboards/charge-entry"))
                   .default,
               }),
             },
             {
-              path: "assets",
+              path: "charge-entry/add-new",
               lazy: async () => ({
-                Component: (await import("app/pages/dashboards/assets"))
+                Component: (await import("app/pages/dashboards/charge-entry/form"))
                   .default,
               }),
             },
             {
-              path: "assets/:type",
+              path: "charge-entry/edit/:id",
               lazy: async () => ({
-                Component: (await import("app/pages/dashboards/assets/Inner"))
-                  .default,
-              }),
-            },
-            {
-              path: "integration",
-              lazy: async () => ({
-                Component: (await import("app/pages/dashboards/integration"))
-                  .default,
-              }),
-            },
-            {
-              path: "ai-image",
-              lazy: async () => ({
-                Component: (await import("app/pages/dashboards/ai-image"))
-                  .default,
-              }),
-            },
-            {
-              path: "ai-image/add-new",
-              lazy: async () => ({
-                Component: (await import("app/pages/dashboards/ai-image/form"))
-                  .default,
-              }),
-            },
-            {
-              path: "ai-image/edit/:id",
-              lazy: async () => ({
-                Component: (await import("app/pages/dashboards/ai-image/form"))
-                  .default,
-              }),
-            },
-            {
-              path: "ai-video",
-              lazy: async () => ({
-                Component: (await import("app/pages/dashboards/ai-video"))
-                  .default,
-              }),
-            },
-            {
-              path: "ai-video/add-new",
-              lazy: async () => ({
-                Component: (await import("app/pages/dashboards/ai-video/form"))
-                  .default,
-              }),
-            },
-            {
-              path: "ai-video/edit/:id",
-              lazy: async () => ({
-                Component: (await import("app/pages/dashboards/ai-video/form"))
-                  .default,
-              }),
-            },
-            {
-              path: "campaign",
-              lazy: async () => ({
-                Component: (await import("app/pages/dashboards/campaign"))
-                  .default,
-              }),
-            },
-            {
-              path: "campaign/add-new",
-              lazy: async () => ({
-                Component: (await import("app/pages/dashboards/campaign/form"))
-                  .default,
-              }),
-            },
-            {
-              path: "campaign/edit/:id",
-              lazy: async () => ({
-                Component: (await import("app/pages/dashboards/campaign/form"))
+                Component: (await import("app/pages/dashboards/charge-entry/form"))
                   .default,
               }),
             },
           ],
         },
         {
-          path: "masters",
+          path: "transactions",
           children: [
             {
               index: true,
-              element: <Navigate to="/masters/region" />,
+              element: <Navigate to="/transactions/charge-entry" />,
             },
             {
-              path: "region",
+              path: "charge-entry",
               lazy: async () => ({
-                Component: (await import("app/pages/masters/region"))
+                Component: (await import("app/pages/transactions/charge-entry"))
                   .default,
               }),
             },
             {
-              path: "region/add-new",
+              path: "charge-entry/add-new",
               lazy: async () => ({
-                Component: (await import("app/pages/masters/region/form"))
+                Component: (await import("app/pages/transactions/charge-entry/form"))
                   .default,
               }),
             },
             {
-              path: "region/edit/:id",
+              path: "charge-entry/edit/:id",
               lazy: async () => ({
-                Component: (await import("app/pages/masters/region/form"))
+                Component: (await import("app/pages/transactions/charge-entry/form"))
                   .default,
               }),
             },
             {
-              path: "target-group",
+              path: "case",
               lazy: async () => ({
-                Component: (await import("app/pages/masters/target-group"))
-                  .default,
-              })
-            },
-            {
-              path: "target-group/add-new",
-              lazy: async () => ({
-                Component: (await import("app/pages/masters/target-group/form"))
+                Component: (await import("app/pages/transactions/case"))
                   .default,
               }),
             },
             {
-              path: "target-group/edit/:id",
+              path: "case/add-new",
               lazy: async () => ({
-                Component: (await import("app/pages/masters/target-group/form"))
+                Component: (await import("app/pages/transactions/case/form"))
                   .default,
               }),
             },
             {
-              path: "social-media",
+              path: "case/edit/:id",
               lazy: async () => ({
-                Component: (await import("app/pages/masters/social-media"))
-                  .default,
-              })
-            },
-            {
-              path: "social-media/add-new",
-              lazy: async () => ({
-                Component: (await import("app/pages/masters/social-media/form"))
+                Component: (await import("app/pages/transactions/case/form"))
                   .default,
               }),
             },
             {
-              path: "social-media/edit/:id",
+              path: "payment-details",
               lazy: async () => ({
-                Component: (await import("app/pages/masters/social-media/form"))
+                Component: (await import("app/pages/transactions/payment-details"))
                   .default,
               }),
             },
             {
-              path: "my-goal",
+              path: "payment-details/add-new",
               lazy: async () => ({
-                Component: (await import("app/pages/masters/my-goal"))
-                  .default,
-              })
-            },
-            {
-              path: "my-goal/add-new",
-              lazy: async () => ({
-                Component: (await import("app/pages/masters/my-goal/form"))
+                Component: (await import("app/pages/transactions/payment-details/form"))
                   .default,
               }),
             },
             {
-              path: "my-goal/edit/:id",
+              path: "payment-details/edit/:id",
               lazy: async () => ({
-                Component: (await import("app/pages/masters/my-goal/form"))
+                Component: (await import("app/pages/transactions/payment-details/form"))
+                  .default,
+              }),
+            },
+          ]
+        },
+        {
+          path: "case-master",
+          children: [
+            {
+              index: true,
+              element: <Navigate to="/case-master/agency" />,
+            },
+            {
+              path: "agency",
+              lazy: async () => ({
+                Component: (await import("app/pages/case-master/agency"))
+                  .default,
+              }),
+            },
+            {
+              path: "agency/add-new",
+              lazy: async () => ({
+                Component: (await import("app/pages/case-master/agency/form"))
+                  .default,
+              }),
+            },
+            {
+              path: "agency/edit/:id",
+              lazy: async () => ({
+                Component: (await import("app/pages/case-master/agency/form"))
                   .default,
               }),
             },

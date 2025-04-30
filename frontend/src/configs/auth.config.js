@@ -3,5 +3,5 @@
  * https://github.com/pinia-studio/jwt-api-node
 **/
 
-export const JWT_HOST_API = "http://localhost:8001";
-export const company = "My Brand";
+export const JWT_HOST_API = "http://69.30.247.216:9001";
+export const company = "";
