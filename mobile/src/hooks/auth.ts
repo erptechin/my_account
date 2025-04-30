@@ -18,11 +18,12 @@ export const useSignUp = (onSuccessCallback: any) => {
 };
 
 export const useLogin = (onSuccessCallback: any) => {
-    const { setToken } = useContext(MainContext)
+    const { setToken, setUser } = useContext(MainContext)
     return useMutation({
         mutationFn: login,
         onSuccess: (data: any) => {
             setToken(data?.token)
+            setUser(data?.user)
             onSuccessCallback(data)
         },
         onError: (error: any) => {

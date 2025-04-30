@@ -1,156 +1,74 @@
 import React, { useContext, useEffect, useState } from 'react';
-import { AppState, PermissionsAndroid, Platform } from 'react-native';
 import FontAwesome from 'react-native-vector-icons/FontAwesome';
 import { useNavigation } from '@react-navigation/native';
-import SmsAndroid from 'react-native-get-sms-android';
+import { SwipeListView } from 'react-native-swipe-list-view';
 
-import Claims from "@/src/components/Claims";
+import SmsList from "./smsList";
 
 import { MainContext } from '@/src/contexts';
 
-import { Box, View, Text, HStack, VStack, Heading } from "@/src/components";
+import { Box, View, Text, HStack, VStack, Heading, Pressable, Spinner } from "@/src/components";
 import { BottomTabs, MainWapper } from "@/src/components/utility";
-import { useAddData } from '../hooks';
-
-function formatTimestamp(millis: any) {
-  const date = new Date(millis);
-  const day = String(date.getDate()).padStart(2, '0');
-  const month = String(date.getMonth() + 1).padStart(2, '0');
-  const year = date.getFullYear();
-  return `${year}-${month}-${day}`;
-}
-
-function parseTransactionAmount(smsBody: any) {
-  // Match both credit and debit patterns
-  const debitPattern = /Rs\.(\d+\.\d{2})\s+spent\s+on\s+your\s+([a-zA-Z]+)\s+(Credit Card|Debit Card)/i;
-  const creditPattern = /Rs\.(\d+\.\d{2})\s+credited\s+to\s+your\s+([a-zA-Z]+)\s+(Account|Card)/i;
-
-  const isDebit = debitPattern.test(smsBody);
-  const isCredit = creditPattern.test(smsBody);
-
-  if (!isDebit && !isCredit) return {};
-
-  // Extract amount
-  const amountMatch = smsBody.match(/Rs\.(\d+\.\d{2})/i);
-  if (!amountMatch) return {};
-  return {
-    // debit: isDebit ? parseFloat(amountMatch[1]) : 0,
-    // credit: isDebit ? 0 : parseFloat(amountMatch[1]),
-    credit: parseFloat(amountMatch[1]),
-    transaction_type: isDebit ? 'debit' : 'credit',
-  };
-}
+import { useInfo, useFeachData, useDeleteData } from '@/src/hooks';
 
 const doctype = "SMS List"
+const fields = ['debit', 'credit', 'transaction_type', 'address', 'date']
 
 export default function Home() {
+  const { user, token } = useContext(MainContext)
   const navigation = useNavigation();
-  const { user } = useContext(MainContext)
-  const bodyRegex = '.*(credited|debited|deposited|withdrawn|transaction|card|account|bank|upi|rs\\.?\\s?\\d+|inr\\s?\\d+|balance|payment|receive|send|imps|neft|rtgs|ref no|upi ref).*';
-  const [search, setSearch] = useState<any>({ box: 'inbox', bodyRegex, indexFrom: 0, maxCount: 10 });
-  const [smsList, setSmsList] = useState([]);
-  const [hasPermission, setHasPermission] = useState(false);
+  const [cases, setCases] = useState([]);
 
-  const mutation = useAddData((data: any) => {
+  const { data: info } = useInfo({ doctype, fields: JSON.stringify(fields) });
+  const [search, setSearch] = useState<any>({ doctype, page: 1, page_length: 100, fields, filters: JSON.stringify([[doctype, "user_id", "=", user?.id]]), or_filters: JSON.stringify([[doctype, "credit", ">", 0], [doctype, "debit", ">", 0]]) });
+  const { data, isLoading, refetch } = useFeachData(search);
+
+  useEffect(() => {
+    if (info?.fields) {
+      const fieldnames = info?.fields.map((field: any) => field.fieldname);
+      setSearch({ ...search, fields: JSON.stringify([...fieldnames, "name"]) })
+    }
+  }, [info])
+
+  useEffect(() => {
+    if (data?.data) {
+      setCases(data?.data)
+    }
+  }, [data])
+
+
+  const mutation = useDeleteData((data: any) => {
 
   });
 
-  // Request SMS permissions
-  const requestSMSPermission = async () => {
-    if (Platform.OS === 'android') {
-      try {
-        const granted = await PermissionsAndroid.request(
-          PermissionsAndroid.PERMISSIONS.READ_SMS,
-          {
-            title: 'SMS Read Permission',
-            message: 'This app needs access to your SMS to read messages.',
-            buttonNeutral: 'Ask Me Later',
-            buttonNegative: 'Cancel',
-            buttonPositive: 'OK',
-          }
-        );
-        if (granted === PermissionsAndroid.RESULTS.GRANTED) {
-          setHasPermission(true);
-          getAllSMS(0);
-        } else {
-          console.log('SMS permission denied');
-        }
-      } catch (err) {
-        console.warn(err);
-      }
-    } else {
-      // iOS - Note: Apple doesn't allow reading SMS except for specific cases
-    }
-  }
+  const renderComplaint = ({ item }: any) => (
+    <HStack className='bg-background-light rounded-lg p-2 my-1 items-center'>
+      <Box className="bg-[#FF000014] p-2 rounded-full flex justify-center items-center w-15 h-15">
+        <FontAwesome name={"calendar-o"} size={20} color={"#FF0000"} />
+      </Box>
+      <VStack className='pl-2'>
+        <Text className='text-[15px] font-medium text-text-dark pt-2'>{item?.address}</Text>
+        <Text className='text-xs text-text-light'>Amount:<Text className='text-text-dark'> {item?.credit} - {item?.debit}</Text></Text>
+        <Text className='text-xs text-text-light'>Type:<Text className='text-tertiary text-xs'> {item?.transaction_type} - {item.date}</Text></Text>
+      </VStack>
+    </HStack>
+  );
 
-  // Get all SMS messages
-  const getAllSMS = async (currentIndex: number) => {
-    if (Platform.OS !== 'android') return;
-
-    try {
-      // Update the search index
-      const updatedSearch = { ...search, indexFrom: currentIndex };
-      setSearch(updatedSearch);
-
-      await new Promise<void>((resolve, reject) => {
-        SmsAndroid.list(
-          JSON.stringify(updatedSearch),
-          (fail: any) => {
-            console.log('Failed with this error: ' + fail);
-            reject(fail);
-          },
-          (_: any, smsList: any) => {
-            const arr = JSON.parse(smsList);
-            // Process the messages
-            for (let item of arr) {
-              let amounts = parseTransactionAmount(item?.body)
-              let value: any = {
-                doctype,
-                body: {
-                  ...item,
-                  message_id: item?._id,
-                  date: formatTimestamp(item?.date),
-                  date_sent: formatTimestamp(item?.date_sent),
-                  user_id: user?.id,
-                  ...amounts
-                }
-              };
-              mutation.mutate(value);
-            }
-
-            // Check if we should continue fetching
-            if (arr.length === updatedSearch.maxCount) {
-              // There might be more messages, fetch next batch
-              getAllSMS(currentIndex + arr.length);
-            }
-            resolve();
-          }
-        );
-      });
-    } catch (error) {
-      console.error('Error fetching SMS:', error);
-    }
-  };
-
-  useEffect(() => {
-    // Request permissions on component mount
-    requestSMSPermission();
-
-    // Check for SMS every time the app comes to foreground
-    const subscription = AppState.addEventListener('change', (nextAppState) => {
-      if (nextAppState === 'active') {
-        getAllSMS(search.indexFrom);
-      }
-    });
-
-    return () => {
-      subscription.remove();
-    };
-  }, []);
+  const renderHiddenItem = ({ item }: any) => (
+    <View className='flex-1 flex-row items-center justify-end pl-4'>
+      <Pressable
+        className='flex bg-red-500 px-4 py-7 overflow-hidden rounded-tr-lg rounded-br-lg'
+        onPress={() => mutation.mutate({ doctype, ids: [item?.name] })}
+      >
+        <Text className='text-[15px] font-medium text-white'>Delete</Text>
+      </Pressable>
+    </View>
+  );
 
   return (
     <>
-      <MainWapper backgroundColor={'rgb(29, 191, 115)'} padding refreshing={false}>
+      <SmsList />
+      <MainWapper backgroundColor={'rgb(29, 191, 115)'} padding onRefresh={refetch} refreshing={isLoading}>
         <Box className='p-3 text-primary bg-primary rounded-b-[60px] pb-5'>
           <VStack className='justify-center items-center'>
             <HStack className='justify-center items-center'>
@@ -169,7 +87,12 @@ export default function Home() {
         </Box>
         <Box className='mt-3 pb-20'>
           <Heading className="mx-5">My Data</Heading>
-          <Claims />
+          <SwipeListView
+            data={cases}
+            renderItem={renderComplaint}
+            renderHiddenItem={renderHiddenItem}
+            rightOpenValue={-75}
+          />
         </Box>
       </MainWapper>
       {/* <BottomTabs navigation={navigation} activeTab="Home" /> */}
