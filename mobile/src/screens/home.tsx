@@ -7,7 +7,7 @@ import SmsList from "./smsList";
 
 import { MainContext } from '@/src/contexts';
 
-import { Box, View, Text, HStack, VStack, Heading, Pressable, Spinner } from "@/src/components";
+import { Box, View, Text, HStack, VStack, Heading, Pressable } from "@/src/components";
 import { BottomTabs, MainWapper } from "@/src/components/utility";
 import { useInfo, useFeachData, useDeleteData } from '@/src/hooks';
 
@@ -17,7 +17,8 @@ const fields = ['debit', 'credit', 'transaction_type', 'address', 'date']
 export default function Home() {
   const { user, token } = useContext(MainContext)
   const navigation = useNavigation();
-  const [cases, setCases] = useState([]);
+  const [total, setTotal] = useState<any>({});
+  const [list, setList] = useState([]);
 
   const { data: info } = useInfo({ doctype, fields: JSON.stringify(fields) });
   const [search, setSearch] = useState<any>({ doctype, page: 1, page_length: 100, fields, filters: JSON.stringify([[doctype, "user_id", "=", user?.id]]), or_filters: JSON.stringify([[doctype, "credit", ">", 0], [doctype, "debit", ">", 0]]) });
@@ -32,10 +33,20 @@ export default function Home() {
 
   useEffect(() => {
     if (data?.data) {
-      setCases(data?.data)
+      let total = { credit: 0, debit: 0, total: 0 }
+      for (let item of data?.data) {
+        if (item?.transaction_type == 'credit') {
+          total['credit'] += item?.credit
+          total['total'] += item?.credit
+        } else {
+          total['debit'] += item?.debit
+          total['total'] -= item?.debit
+        }
+      }
+      setList(data?.data)
+      setTotal(total)
     }
   }, [data])
-
 
   const mutation = useDeleteData((data: any) => {
 
@@ -47,9 +58,9 @@ export default function Home() {
         <FontAwesome name={"calendar-o"} size={20} color={"#FF0000"} />
       </Box>
       <VStack className='pl-2'>
-        <Text className='text-[15px] font-medium text-text-dark pt-2'>{item?.address}</Text>
-        <Text className='text-xs text-text-light'>Amount:<Text className='text-text-dark'> {item?.credit} - {item?.debit}</Text></Text>
-        <Text className='text-xs text-text-light'>Type:<Text className='text-tertiary text-xs'> {item?.transaction_type} - {item.date}</Text></Text>
+        <Text className='text-[15px] font-medium text-text-dark pt-2'>{item?.address} - {item.date}</Text>
+        <Text className='text-xs text-text-light'>Amount:<Text className={item?.transaction_type == 'credit' ? 'text-primary text-xs' : 'text-tertiary text-xs'}> {item?.transaction_type == 'credit' ? item?.credit : item?.debit}</Text></Text>
+        <Text className='text-xs text-text-light'>Type:<Text className={item?.transaction_type == 'credit' ? 'text-primary text-xs' : 'text-tertiary text-xs'}> {item?.transaction_type}</Text></Text>
       </VStack>
     </HStack>
   );
@@ -85,12 +96,21 @@ export default function Home() {
             </HStack>)}
           </VStack>
         </Box>
-        <Box className='mt-3 pb-20'>
-          <Heading className="mx-5">My Data</Heading>
+        <Box className='m-2 pb-20'>
+
+          <HStack className="content-center justify-between m-2">
+            <Heading className='m-2'>My Data</Heading>
+            <HStack>
+              <Text className='text-lg m-2'>CR: <Text className={'text-primary'}>{total?.credit}</Text></Text>
+              <Text className='text-lg m-2'>DR: <Text className={'text-tertiary'}>{total?.debit}</Text></Text>
+              <Text className='text-lg m-2'>TOTAL: <Text className={total?.total > 0 ? 'text-primary' : 'text-tertiary'}>{total?.total}</Text></Text>
+            </HStack>
+          </HStack>
+
           <SwipeListView
-            data={cases}
+            data={list}
             renderItem={renderComplaint}
-            renderHiddenItem={renderHiddenItem}
+            // renderHiddenItem={renderHiddenItem}
             rightOpenValue={-75}
           />
         </Box>
