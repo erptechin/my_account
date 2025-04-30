@@ -1,0 +1,28 @@
+{
+  "nav": {
+    "dashboards": {
+      "dashboards": "Dashboards",
+      "home": "Home",
+      "crm-analytics": "CRM Analytics",
+      "brand": "Brand",
+      "assets": "Assets",
+      "integration": "Integration",
+      "ai-image": "AI Image",
+      "ai-video": "AI Video",
+      "campaign": "Campaign"
+    },
+    "masters": {
+      "masters": "Masters",
+      "region": "Region",
+      "target-group": "Target Group",
+      "social-media": "Social Media",
+      "my-goal": "My Goal"
+    },
+    "settings": {
+      "settings": "Settings",
+      "general": "General",
+      "appearance": "Appearance",
+      "sessions": "Sessions & Password"
+    }
+  }
+}

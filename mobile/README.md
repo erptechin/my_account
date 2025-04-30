@@ -82,4 +82,4 @@ For APK
 
 cd android
 ./gradlew clean
-./gradlew assembleRelease --stacktrace
+./gradlew assembleRelease
