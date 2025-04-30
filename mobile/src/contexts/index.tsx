@@ -12,6 +12,7 @@ interface MainContextProps {
     token: any,
     setToken: (params: object) => Promise<void>,
     user: any,
+    setUser: (params: object) => Promise<void>,
     labels: any,
     logout: () => Promise<void>
 }
@@ -21,6 +22,7 @@ export const MainContext = createContext<MainContextProps>({
     token: null,
     setToken: () => Promise.resolve(),
     user: null,
+    setUser: () => Promise.resolve(),
     labels: null,
     logout: () => Promise.resolve(),
 })
@@ -40,9 +42,11 @@ export const MainProvider: FC<PropsWithChildren> = ({ children }) => {
     useEffect(() => {
         const fetchData = async () => {
             const token = await getData('token')
-            if (token) {
+            const user = await getData('user')
+            if (token && user) {
                 refetch()
                 setToken(token)
+                setUser(user)
             } else {
                 setToken(null)
             }
@@ -63,20 +67,26 @@ export const MainProvider: FC<PropsWithChildren> = ({ children }) => {
         }
     }, [data, error]);
 
-
     const handleLogout = async () => {
         removeData('token');
         setToken(null);
+        removeData('user');
+        setUser(null);
         DevSettings.reload();
     }
 
-    const handleToken = async (value: any) => {
-        setData('token', value)
-        setToken(value)
+    const handleToken = async (token: any) => {
+        setData('token', token)
+        setToken(token)
+    }
+
+    const handleUser = async (user: any) => {
+        setData('user', user)
+        setUser(user)
     }
 
     return (
-        <MainContext.Provider value={{ isLoading, labels, token, setToken: handleToken, user, logout: handleLogout }}>
+        <MainContext.Provider value={{ isLoading, labels, token, setToken: handleToken, user, setUser: handleUser, logout: handleLogout }}>
             {children}
         </MainContext.Provider>
     )

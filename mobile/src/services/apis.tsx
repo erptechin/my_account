@@ -63,6 +63,12 @@ export const showError = (error: any) => {
     }
 };
 
+export const signUp = async (body: any) => {
+    body['company'] = Config.REACT_APP_COMPANY
+    const response = await apiClient.post(`method/my_account.api.auth.sign_up`, body);
+    return response.data;
+};
+
 export const login = async (params: any) => {
     params['company'] = Config.REACT_APP_COMPANY
     const response = await apiClient.get(`method/my_account.api.auth.login`, { params });
@@ -73,6 +79,7 @@ export const logOut = async () => {
     const response = await apiClient.post(`method/logout`, { withCredentials: false });
     return response.data;
 };
+
 
 export const changePassword = async (body: any) => {
     await getAuthorizationToken()

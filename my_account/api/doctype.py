@@ -81,6 +81,7 @@ def list_data():
         doctype = frappe.local.form_dict.get("doctype")
         fields = frappe.local.form_dict.get("fields") or ["*"]
         filters = frappe.local.form_dict.get("filters") or []
+        or_filters = frappe.local.form_dict.get("or_filters") or []
         page = int(frappe.local.form_dict.get("page", 1))
         page_length = int(frappe.local.form_dict.get("page_length", 10))
         order_by = frappe.local.form_dict.get("order_by") or "modified desc"
@@ -91,6 +92,7 @@ def list_data():
         data = frappe.get_all(
             doctype,
             filters=filters,
+            or_filters=or_filters,
             fields=fields,
             order_by=order_by,
             start=(page - 1) * page_length,
