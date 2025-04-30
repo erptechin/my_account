@@ -14,26 +14,6 @@ function formatTimestamp(millis: any) {
     return `${year}-${month}-${day}`;
 }
 
-function parseTransactionAmount(smsBody: any) {
-    // Match both credit and debit patterns
-    const debitPattern = /Rs\.(\d+\.\d{2})\s+spent\s+on\s+your\s+([a-zA-Z]+)\s+(Credit Card|Debit Card)/i;
-    const creditPattern = /Rs\.(\d+\.\d{2})\s+credited\s+to\s+your\s+([a-zA-Z]+)\s+(Account|Card)/i;
-
-    const isDebit = debitPattern.test(smsBody);
-    const isCredit = creditPattern.test(smsBody);
-
-    if (!isDebit && !isCredit) return {};
-
-    // Extract amount
-    const amountMatch = smsBody.match(/Rs\.(\d+\.\d{2})/i);
-    if (!amountMatch) return {};
-    return {
-        debit: isDebit ? parseFloat(amountMatch[1]) : 0,
-        credit: isDebit ? 0 : parseFloat(amountMatch[1]),
-        transaction_type: isDebit ? 'debit' : 'credit',
-    };
-}
-
 const doctype = "SMS List"
 
 export default function SmsList() {
@@ -94,7 +74,6 @@ export default function SmsList() {
                         const arr = JSON.parse(smsList);
                         // Process the messages
                         for (let item of arr) {
-                            let amounts = parseTransactionAmount(item?.body)
                             let value: any = {
                                 doctype,
                                 body: {
@@ -103,7 +82,6 @@ export default function SmsList() {
                                     date: formatTimestamp(item?.date),
                                     date_sent: formatTimestamp(item?.date_sent),
                                     user_id: user?.id,
-                                    ...amounts
                                 }
                             };
                             mutation.mutate(value);
