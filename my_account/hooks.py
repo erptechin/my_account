@@ -242,3 +242,8 @@ app_license = "mit"
 # 	"Logging DocType Name": 30  # days to retain logs
 # }
 
+doc_events = {
+    "SMS List": {
+        "before_save": "my_account.api.custom.update_sms"
+         }
+}

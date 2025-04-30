@@ -1,4 +1,4 @@
-import { useEffect, useState } from 'react';
+import { useContext, useEffect, useState } from 'react';
 import FontAwesome from 'react-native-vector-icons/FontAwesome';
 import { useNavigation } from '@react-navigation/native';
 import { SwipeListView } from 'react-native-swipe-list-view';
@@ -6,16 +6,18 @@ import { SwipeListView } from 'react-native-swipe-list-view';
 import { Box, HStack, Pressable, Text, View, VStack, Spinner } from "@/src/components";
 
 import { useInfo, useFeachData, useDeleteData } from '@/src/hooks';
+import { MainContext } from '../contexts';
 
-const doctype = "Warranty Claim"
-const fields = ['status', 'customer', 'complaint_date', 'serial_no']
+const doctype = "SMS List"
+const fields = ['debit', 'credit', 'transaction_type', 'address', 'date']
 
 export default function Claims() {
+  const { user } = useContext(MainContext)
   const navigation = useNavigation();
   const [cases, setCases] = useState([]);
 
   const { data: info } = useInfo({ doctype, fields: JSON.stringify(fields) });
-  const [search, setSearch] = useState<any>({ doctype, page: 1, page_length: 10, fields: null });
+  const [search, setSearch] = useState<any>({ doctype, page: 1, page_length: 100, fields, filters: JSON.stringify([[doctype, "user_id", "=", user?.id], [doctype, "credit", "!=", 0]]) });
   const { data, isFetched } = useFeachData(search);
 
   useEffect(() => {
@@ -42,9 +44,9 @@ export default function Claims() {
         <FontAwesome name={"calendar-o"} size={20} color={"#FF0000"} />
       </Box>
       <VStack className='pl-2'>
-        <Text className='text-[15px] font-medium text-text-dark pt-2'>{item?.customer}</Text>
-        <Text className='text-xs text-text-light'>Date:<Text className='text-text-dark'> {(item?.complaint_date)}</Text></Text>
-        <Text className='text-xs text-text-light'>Status:<Text className='text-tertiary text-xs'> {item?.status}</Text></Text>
+        <Text className='text-[15px] font-medium text-text-dark pt-2'>{item?.address}</Text>
+        <Text className='text-xs text-text-light'>Amount:<Text className='text-text-dark'> {item?.credit} - {item?.debit}</Text></Text>
+        <Text className='text-xs text-text-light'>Type:<Text className='text-tertiary text-xs'> {item?.transaction_type} - {item.date}</Text></Text>
       </VStack>
     </HStack>
   );
@@ -69,11 +71,6 @@ export default function Claims() {
         renderHiddenItem={renderHiddenItem}
         rightOpenValue={-75}
       />
-      {/* <Box className='justify-center items-center absolute px-5 bg-primary rounded-2xl top-[300px] right-[-25px]'>
-        <Pressable className='py-2' onPress={() => navigation.navigate('complaint')}>
-          <Text className='text-white text-[15px]'>Send Complaint</Text>
-        </Pressable>
-      </Box> */}
     </Box>
   );
 }

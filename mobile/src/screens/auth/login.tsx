@@ -4,7 +4,7 @@ import * as Yup from "yup";
 import Feather from 'react-native-vector-icons/Feather';
 import { useNavigation } from "@react-navigation/native";
 
-import { Box, Text, VStack } from "@/src/components";
+import { Box, Pressable, Text, VStack } from "@/src/components";
 import { InputBox, ButtonBox } from "@/src/components/utility";
 import { Avatar, AvatarImage } from "@/src/components/ui/avatar";
 
@@ -47,7 +47,7 @@ export default function Login() {
                         <AvatarImage source={Images.logo} />
                     </Avatar>
                 </Box>
-                <Text className='text-[15px] font-semibold text-text-dark text-center'>Welcome to Unitede</Text>
+                <Text className='text-[15px] font-semibold text-text-dark text-center'>Welcome to My Account</Text>
                 <Text className='text-[15px] font-normal text-text-light pb-2'>Continue to Login In</Text>
             </VStack>
 
@@ -58,7 +58,7 @@ export default function Login() {
             >
                 {({ handleSubmit }) => {
                     return <>
-                        <Text className='text-xl font-semibold text-text-dark'>Login In as Unitede</Text>
+                        <Text className='text-xl font-semibold text-text-dark'>Login In to My Account</Text>
                         <InputBox
                             error={true}
                             required={true}
@@ -77,6 +77,13 @@ export default function Login() {
 
                         <ButtonBox value={'Login'} isLoading={mutation.isPending} onClick={handleSubmit} />
 
+                        <VStack className='justify-center items-center'>
+                            <Pressable className="mt-2" onPress={() => navigation.navigate('register')}>
+                                <Text className='text-text-light text-[17px]'>Don't have an Account?
+                                    <Text className='text-primary text-[17px]'> Register</Text>
+                                </Text>
+                            </Pressable>
+                        </VStack>
                     </>
                 }}
             </Formik>

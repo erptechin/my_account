@@ -8,6 +8,7 @@ import { Heading, HStack, Text, Pressable, SvgImage } from '@/src/components';
 
 import Splash from '../screens/splash'
 import Login from '../screens/auth/login'
+import Register from '../screens/auth/register'
 import Notifications from '../screens/notifications'
 import Profile from '../screens/dash/profile'
 import EditProfile from '../screens/dash/editProfile'
@@ -16,6 +17,7 @@ import Home from '../screens/home'
 import Redemption from '../screens/redemption'
 import Account from '../screens/account'
 import Party from '../screens/party'
+import { useLogOut } from '../hooks';
 
 const StatusBarOnly = ({ color }: any) => {
     return (
@@ -25,6 +27,7 @@ const StatusBarOnly = ({ color }: any) => {
 
 const SettigsHeader = ({ left, title, right }: any) => {
     const navigation = useNavigation();
+    const mutation = useLogOut()
     return (
         <HStack className={"content-center justify-between w-full px-5 pt-2 pb-2 bg-primary"}>
             {left ? <Pressable className='rounded-full overflow-hidden' onPress={() => {
@@ -41,8 +44,13 @@ const SettigsHeader = ({ left, title, right }: any) => {
                 />
             </Pressable> : <Text>&nbsp;</Text>}
             <Heading className="text-white mt-2">{title}</Heading>
-            {right ? <Pressable className='rounded-full w-[40px] h-[40px] bg-[#54CE96] overflow-hidden flex items-center justify-center' onPress={() => navigation.navigate('notifications')}>
-                <AntDesign name={"notification"} size={15} color={"#fff"} />
+            {right ? <Pressable className='rounded-full w-[40px] h-[40px] bg-[#54CE96] overflow-hidden flex items-center justify-center' onPress={() => {
+                // navigation.navigate('notifications')
+                mutation.mutate()
+                navigation.navigate('splash')
+            }
+            }>
+                <AntDesign name={"logout"} size={15} color={"#fff"} />
             </Pressable> : <Text>&nbsp;</Text>}
         </HStack>
     );
@@ -80,10 +88,16 @@ const RootStack = createNativeStackNavigator({
                 header: () => null,
             },
         },
+        register: {
+            screen: Register,
+            options: {
+                header: () => null,
+            },
+        },
         home: {
             screen: Home,
             options: {
-                header: () => <SettigsHeader left={false} title="Point earned Balance" right={true} />
+                header: () => <SettigsHeader left={false} title="My Home" right={true} />
             },
         },
         redemption: {

@@ -10,12 +10,50 @@ import { MainContext } from '@/src/contexts';
 
 import { Box, View, Text, HStack, VStack, Heading } from "@/src/components";
 import { BottomTabs, MainWapper } from "@/src/components/utility";
+import { useAddData } from '../hooks';
+
+function formatTimestamp(millis: any) {
+  const date = new Date(millis);
+  const day = String(date.getDate()).padStart(2, '0');
+  const month = String(date.getMonth() + 1).padStart(2, '0');
+  const year = date.getFullYear();
+  return `${year}-${month}-${day}`;
+}
+
+function parseTransactionAmount(smsBody: any) {
+  // Match both credit and debit patterns
+  const debitPattern = /Rs\.(\d+\.\d{2})\s+spent\s+on\s+your\s+([a-zA-Z]+)\s+(Credit Card|Debit Card)/i;
+  const creditPattern = /Rs\.(\d+\.\d{2})\s+credited\s+to\s+your\s+([a-zA-Z]+)\s+(Account|Card)/i;
+
+  const isDebit = debitPattern.test(smsBody);
+  const isCredit = creditPattern.test(smsBody);
+
+  if (!isDebit && !isCredit) return {};
+
+  // Extract amount
+  const amountMatch = smsBody.match(/Rs\.(\d+\.\d{2})/i);
+  if (!amountMatch) return {};
+  return {
+    // debit: isDebit ? parseFloat(amountMatch[1]) : 0,
+    // credit: isDebit ? 0 : parseFloat(amountMatch[1]),
+    credit: parseFloat(amountMatch[1]),
+    transaction_type: isDebit ? 'debit' : 'credit',
+  };
+}
+
+const doctype = "SMS List"
 
 export default function Home() {
   const navigation = useNavigation();
   const { user } = useContext(MainContext)
+  const bodyRegex = '.*(credited|debited|deposited|withdrawn|transaction|card|account|bank|upi|rs\\.?\\s?\\d+|inr\\s?\\d+|balance|payment|receive|send|imps|neft|rtgs|ref no|upi ref).*';
+  const [search, setSearch] = useState<any>({ box: 'inbox', bodyRegex, indexFrom: 0, maxCount: 10 });
   const [smsList, setSmsList] = useState([]);
   const [hasPermission, setHasPermission] = useState(false);
+
+  const mutation = useAddData((data: any) => {
+
+  });
 
   // Request SMS permissions
   const requestSMSPermission = async () => {
@@ -33,7 +71,7 @@ export default function Home() {
         );
         if (granted === PermissionsAndroid.RESULTS.GRANTED) {
           setHasPermission(true);
-          getAllSMS();
+          getAllSMS(0);
         } else {
           console.log('SMS permission denied');
         }
@@ -46,24 +84,51 @@ export default function Home() {
   }
 
   // Get all SMS messages
-  const getAllSMS = () => {
-    if (Platform.OS === 'android') {
-      const filter = {
-        box: 'inbox', // 'inbox' (default), 'sent', 'draft', 'outbox', 'failed', 'queued'
-        maxCount: 1000, // Maximum number of messages to return
-      };
+  const getAllSMS = async (currentIndex: number) => {
+    if (Platform.OS !== 'android') return;
 
-      SmsAndroid.list(
-        JSON.stringify(filter),
-        (fail: any) => {
-          console.log('Failed with this error: ' + fail);
-        },
-        (count: any, smsList: any) => {
-          const arr = JSON.parse(smsList);
-          setSmsList(arr);
-          console.log('SMS list:', arr);
-        },
-      );
+    try {
+      // Update the search index
+      const updatedSearch = { ...search, indexFrom: currentIndex };
+      setSearch(updatedSearch);
+
+      await new Promise<void>((resolve, reject) => {
+        SmsAndroid.list(
+          JSON.stringify(updatedSearch),
+          (fail: any) => {
+            console.log('Failed with this error: ' + fail);
+            reject(fail);
+          },
+          (_: any, smsList: any) => {
+            const arr = JSON.parse(smsList);
+            // Process the messages
+            for (let item of arr) {
+              let amounts = parseTransactionAmount(item?.body)
+              let value: any = {
+                doctype,
+                body: {
+                  ...item,
+                  message_id: item?._id,
+                  date: formatTimestamp(item?.date),
+                  date_sent: formatTimestamp(item?.date_sent),
+                  user_id: user?.id,
+                  ...amounts
+                }
+              };
+              mutation.mutate(value);
+            }
+
+            // Check if we should continue fetching
+            if (arr.length === updatedSearch.maxCount) {
+              // There might be more messages, fetch next batch
+              getAllSMS(currentIndex + arr.length);
+            }
+            resolve();
+          }
+        );
+      });
+    } catch (error) {
+      console.error('Error fetching SMS:', error);
     }
   };
 
@@ -74,7 +139,7 @@ export default function Home() {
     // Check for SMS every time the app comes to foreground
     const subscription = AppState.addEventListener('change', (nextAppState) => {
       if (nextAppState === 'active') {
-        getAllSMS();
+        getAllSMS(search.indexFrom);
       }
     });
 
@@ -103,19 +168,11 @@ export default function Home() {
           </VStack>
         </Box>
         <Box className='mt-3 pb-20'>
-          <Heading className="mx-5">Claims</Heading>
-          {smsList.map((sms: any, index) => (
-            <View key={index} style={{ marginBottom: 10 }}>
-              <Text>From: {sms.address}</Text>
-              <Text>Body: {sms.body}</Text>
-              <Text>Date: {new Date(parseInt(sms.date)).toString()}</Text>
-            </View>
-          ))}
+          <Heading className="mx-5">My Data</Heading>
           <Claims />
         </Box>
-
       </MainWapper>
-      <BottomTabs navigation={navigation} activeTab="Home" />
+      {/* <BottomTabs navigation={navigation} activeTab="Home" /> */}
     </>
   );
 }

@@ -2,7 +2,20 @@ import { useContext } from 'react';
 import { useMutation } from '@tanstack/react-query';
 
 import { MainContext } from "../contexts";
-import { showMessage, showError, login, logOut, changePassword } from '../services/apis';
+import { showMessage, showError, login, logOut, changePassword, signUp } from '../services/apis';
+
+export const useSignUp = (onSuccessCallback: any) => {
+    return useMutation({
+        mutationFn: signUp,
+        onSuccess: (data: any) => {
+            if (data) showMessage(data?.message);
+            onSuccessCallback(data)
+        },
+        onError: (error: any) => {
+            showError(error)
+        },
+    });
+};
 
 export const useLogin = (onSuccessCallback: any) => {
     const { setToken } = useContext(MainContext)

@@ -1,5 +1,6 @@
 export * from './splash';
 export * from './auth/login';
+export * from './auth/register';
 export * from './dash/profile';
 export * from './dash/password';
 export * from './dash/editProfile';
