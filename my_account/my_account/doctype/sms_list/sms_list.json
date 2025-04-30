@@ -1,0 +1,202 @@
+{
+ "actions": [],
+ "allow_rename": 1,
+ "creation": "2025-04-29 22:32:54.105823",
+ "doctype": "DocType",
+ "engine": "InnoDB",
+ "field_order": [
+  "user_id",
+  "message_id",
+  "creator",
+  "date",
+  "error_code",
+  "locked",
+  "protocol",
+  "reply_path_present",
+  "service_center",
+  "status",
+  "thread_id",
+  "credit",
+  "debit",
+  "column_break_rwtl",
+  "address",
+  "body",
+  "date_sent",
+  "person",
+  "read",
+  "seen",
+  "sub_id",
+  "type",
+  "subject",
+  "transaction_type"
+ ],
+ "fields": [
+  {
+   "fieldname": "address",
+   "fieldtype": "Data",
+   "in_list_view": 1,
+   "label": "Address",
+   "reqd": 1
+  },
+  {
+   "fieldname": "body",
+   "fieldtype": "Small Text",
+   "in_list_view": 1,
+   "label": "Body",
+   "reqd": 1
+  },
+  {
+   "fieldname": "date",
+   "fieldtype": "Date",
+   "in_list_view": 1,
+   "in_standard_filter": 1,
+   "label": "Date",
+   "reqd": 1
+  },
+  {
+   "fieldname": "message_id",
+   "fieldtype": "Data",
+   "in_list_view": 1,
+   "label": "Message Id",
+   "reqd": 1
+  },
+  {
+   "fieldname": "creator",
+   "fieldtype": "Data",
+   "label": "Creator"
+  },
+  {
+   "fieldname": "date_sent",
+   "fieldtype": "Date",
+   "in_list_view": 1,
+   "in_standard_filter": 1,
+   "label": "Date Sent",
+   "reqd": 1
+  },
+  {
+   "fieldname": "error_code",
+   "fieldtype": "Data",
+   "label": "Error Code"
+  },
+  {
+   "fieldname": "locked",
+   "fieldtype": "Data",
+   "label": "Locked"
+  },
+  {
+   "fieldname": "person",
+   "fieldtype": "Data",
+   "label": "Person"
+  },
+  {
+   "fieldname": "protocol",
+   "fieldtype": "Data",
+   "label": "Protocol"
+  },
+  {
+   "fieldname": "read",
+   "fieldtype": "Data",
+   "label": "Read"
+  },
+  {
+   "fieldname": "reply_path_present",
+   "fieldtype": "Data",
+   "label": "Reply Path Present"
+  },
+  {
+   "fieldname": "seen",
+   "fieldtype": "Data",
+   "label": "Seen"
+  },
+  {
+   "fieldname": "service_center",
+   "fieldtype": "Data",
+   "label": "Service Center"
+  },
+  {
+   "fieldname": "status",
+   "fieldtype": "Data",
+   "label": "Status"
+  },
+  {
+   "fieldname": "sub_id",
+   "fieldtype": "Data",
+   "label": "Sub Id"
+  },
+  {
+   "fieldname": "subject",
+   "fieldtype": "Data",
+   "label": "Subject"
+  },
+  {
+   "fieldname": "thread_id",
+   "fieldtype": "Data",
+   "label": "Thread Id"
+  },
+  {
+   "fieldname": "type",
+   "fieldtype": "Data",
+   "label": "Type"
+  },
+  {
+   "fieldname": "user_id",
+   "fieldtype": "Link",
+   "in_filter": 1,
+   "in_list_view": 1,
+   "in_standard_filter": 1,
+   "label": "User Id",
+   "options": "User",
+   "reqd": 1
+  },
+  {
+   "fieldname": "column_break_rwtl",
+   "fieldtype": "Column Break"
+  },
+  {
+   "fieldname": "transaction_type",
+   "fieldtype": "Select",
+   "label": "Transaction Type",
+   "options": "debit\ncredit"
+  },
+  {
+   "fieldname": "credit",
+   "fieldtype": "Float",
+   "in_list_view": 1,
+   "label": "Credit"
+  },
+  {
+   "fieldname": "debit",
+   "fieldtype": "Float",
+   "in_list_view": 1,
+   "label": "Debit"
+  }
+ ],
+ "grid_page_length": 50,
+ "index_web_pages_for_search": 1,
+ "links": [],
+ "modified": "2025-04-30 09:20:25.794501",
+ "modified_by": "Administrator",
+ "module": "My Account",
+ "name": "SMS List",
+ "owner": "Administrator",
+ "permissions": [
+  {
+   "create": 1,
+   "delete": 1,
+   "email": 1,
+   "export": 1,
+   "print": 1,
+   "read": 1,
+   "report": 1,
+   "role": "System Manager",
+   "share": 1,
+   "write": 1
+  }
+ ],
+ "row_format": "Dynamic",
+ "show_title_field_in_link": 1,
+ "sort_field": "modified",
+ "sort_order": "DESC",
+ "states": [],
+ "title_field": "message_id"
+}
