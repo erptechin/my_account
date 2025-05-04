@@ -51,7 +51,7 @@ export const useAddData = (onSuccessCallback: any) => {
             return addData(params)
         },
         onSuccess: (data, variable: any) => {
-            if (data) showMessage(`${variable.doctype} add successfully`);
+            if (data && !variable.notAlert) showMessage(`${variable.doctype} add successfully`);
             onSuccessCallback(data)
             queryClient.invalidateQueries({ queryKey: [dataKey(variable.doctype)] });
         },

@@ -144,7 +144,7 @@ export const InputBox = (props: any) => {
                 onChangeText={(value: any) => {
                   form.setFieldValue(props.name, value);
                 }}
-                className="px-1"
+                className="px-1 w-[90%]"
               />
             </View>
             {form?.errors[props.name] && form?.touched[props.name] && (<Text className="p-2 text-red-500">{form.errors[props.name]}</Text>)}
@@ -208,7 +208,6 @@ export const DateBox = (props: any) => {
   return (
     <Field name={props.name}>
       {({ field, form, meta }: any) => {
-
         const formattedDate = new Intl.DateTimeFormat('en-US', {
           day: '2-digit',
           month: '2-digit',
@@ -216,20 +215,28 @@ export const DateBox = (props: any) => {
         }).format(field?.value ? new Date(field.value) : new Date());
 
         const onChange = (event: any, selectedDate: any) => {
-          clearTimeout(useTime.current)
-          const currentDate = selectedDate || new Date();
-          const formattedDate = currentDate.toISOString().split('T')[0];
-          form.setFieldValue(props.name, formattedDate);
-          useTime.current = setTimeout(() => {
-            setShow(false)
-          }, 1000)
+          if (event.type === 'set' && selectedDate) {
+            const currentDate = selectedDate || new Date();
+            const formattedDate = currentDate.toISOString().split('T')[0];
+            setShow(false);
+            setTimeout(() => {
+              form.setFieldValue(props.name, formattedDate);
+            }, 100)
+          } else {
+            setShow(false);
+          }
         };
+
         return (
           <View className={"relative container rounded"}>
             {props.label && (<Text className="pl-2 pt-5 text-text-light">{props.label}</Text>)}
             <View className={meta?.error ? "flex flex-row bg-background-light rounded-3xl py-2 pl-5 h-fit mt-3 items-center border border-red-500" : "flex flex-row bg-background-light rounded-3xl py-3 pl-5 h-fit mt-3 items-center border border-background-dark"}>
-              {props.icon}
-              <Pressable className="bg-background-light hover:bg-background-dark-600 px-3" onPress={() => setShow(!show)}><Text className="text-lg text-left">{formattedDate}</Text></Pressable>
+              <Pressable onPress={() => setShow(!show)}>
+                <HStack>
+                  {props.icon}
+                  <Text className="bg-background-light hover:bg-background-dark-600 px-3"><Text className="text-md text-left">{formattedDate}</Text></Text>
+                </HStack>
+              </Pressable>
             </View>
             {show && (<DateTimePicker
               value={field?.value ? new Date(field.value) : new Date()}

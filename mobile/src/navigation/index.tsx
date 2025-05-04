@@ -45,12 +45,10 @@ const SettigsHeader = ({ left, title, right }: any) => {
             </Pressable> : <Text>&nbsp;</Text>}
             <Heading className="text-white mt-2">{title}</Heading>
             {right ? <Pressable className='rounded-full w-[40px] h-[40px] bg-[#54CE96] overflow-hidden flex items-center justify-center' onPress={() => {
-                // navigation.navigate('notifications')
-                mutation.mutate()
-                navigation.navigate('splash')
+                navigation.navigate('profile')
             }
             }>
-                <AntDesign name={"logout"} size={15} color={"#fff"} />
+                <AntDesign name={"setting"} size={15} color={"#fff"} />
             </Pressable> : <Text>&nbsp;</Text>}
         </HStack>
     );

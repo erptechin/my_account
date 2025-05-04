@@ -2,27 +2,147 @@ import React, { useContext, useEffect, useState } from 'react';
 import FontAwesome from 'react-native-vector-icons/FontAwesome';
 import { useNavigation } from '@react-navigation/native';
 import { SwipeListView } from 'react-native-swipe-list-view';
-
-import SmsList from "./smsList";
+import SmsAndroid from 'react-native-get-sms-android';
 
 import { MainContext } from '@/src/contexts';
 
-import { Box, View, Text, HStack, VStack, Heading, Pressable } from "@/src/components";
-import { BottomTabs, MainWapper } from "@/src/components/utility";
-import { useInfo, useFeachData, useDeleteData } from '@/src/hooks';
+import { Box, Text, HStack, VStack, Pressable } from "@/src/components";
+import { MainWapper } from "@/src/components/utility";
+import { useInfo, useFeachData, useAddData } from '@/src/hooks';
+import { AppState, PermissionsAndroid, Platform } from 'react-native';
+import { getData, setData } from "../hooks/useStorage";
+
+function formatTimestamp(millis: any) {
+  const date = new Date(millis);
+  const day = String(date.getDate()).padStart(2, '0');
+  const month = String(date.getMonth() + 1).padStart(2, '0');
+  const year = date.getFullYear();
+  return `${year}-${month}-${day}`;
+}
 
 const doctype = "SMS List"
 const fields = ['debit', 'credit', 'transaction_type', 'address', 'date']
 
+let date = new Date()
+let year = date.getFullYear();
+let month = String(date.getMonth() + 1).padStart(2, '0');
+let lastDate = new Date(year, date.getMonth() + 1, 0).getDate();
+
 export default function Home() {
-  const { user, token } = useContext(MainContext)
+  const { user } = useContext(MainContext)
   const navigation = useNavigation();
   const [total, setTotal] = useState<any>({});
   const [list, setList] = useState([]);
 
+  const bodyRegex = '.*(credited|debited|deposited|withdrawn|transaction|card|account|bank|upi|rs\\.?\\s?\\d+|inr\\s?\\d+|balance|payment|receive|send|imps|neft|rtgs|ref no|upi ref).*';
+  const [searchSms, setSearchSms] = useState<any>({ box: 'inbox', sort: 'DESC', projection: ['_id'], bodyRegex, indexFrom: 0, maxCount: 10 });
+  const [hasPermission, setHasPermission] = useState(false);
+  const mutation = useAddData((data: any) => {
+
+  });
+
   const { data: info } = useInfo({ doctype, fields: JSON.stringify(fields) });
-  const [search, setSearch] = useState<any>({ doctype, page: 1, page_length: 100, fields, filters: JSON.stringify([[doctype, "user_id", "=", user?.id]]), or_filters: JSON.stringify([[doctype, "credit", ">", 0], [doctype, "debit", ">", 0]]) });
+  const [search, setSearch] = useState<any>({ doctype, page: 1, page_length: 100, fields, filters: JSON.stringify([[doctype, "date", "Between", [`${year}-${month}-01`, `${year}-${month}-${lastDate}`]], [doctype, "user_id", "=", user?.id]]), or_filters: JSON.stringify([[doctype, "credit", ">", 0], [doctype, "debit", ">", 0]]) });
   const { data, isLoading, refetch } = useFeachData(search);
+
+
+  // Request SMS permissions
+  const requestSMSPermission = async () => {
+    if (Platform.OS === 'android') {
+      try {
+        const granted = await PermissionsAndroid.request(
+          PermissionsAndroid.PERMISSIONS.READ_SMS,
+          {
+            title: 'SMS Read Permission',
+            message: 'This app needs access to your SMS to read messages.',
+            buttonNeutral: 'Ask Me Later',
+            buttonNegative: 'Cancel',
+            buttonPositive: 'OK',
+          }
+        );
+        if (granted === PermissionsAndroid.RESULTS.GRANTED) {
+          setHasPermission(true);
+          getAllSMS(0);
+        } else {
+          console.log('SMS permission denied');
+        }
+      } catch (err) {
+        console.warn(err);
+      }
+    } else {
+      // iOS - Note: Apple doesn't allow reading SMS except for specific cases
+    }
+  }
+
+  // Get all SMS messages
+  const getAllSMS = async (currentIndex: number) => {
+    if (Platform.OS !== 'android') return;
+
+    try {
+      // Update the search index
+      const updatedSearch = { ...search, indexFrom: currentIndex };
+      setSearch(updatedSearch);
+
+      await new Promise<void>((resolve, reject) => {
+        SmsAndroid.list(
+          JSON.stringify(updatedSearch),
+          (fail: any) => {
+            console.log('Failed with this error: ' + fail);
+            reject(fail);
+          },
+          async (_: any, smsList: any) => {
+            const arr = JSON.parse(smsList);
+            let smsId = await getData('smsId') ?? null
+            let tempSmsId = null
+            // Process the messages
+            for (let item of arr) {
+              if (!smsId && smsId < item?._id) {
+                tempSmsId = item?._id
+                let value: any = {
+                  doctype,
+                  body: {
+                    ...item,
+                    message_id: item?._id,
+                    date: formatTimestamp(item?.date),
+                    date_sent: formatTimestamp(item?.date_sent),
+                    user_id: user?.id,
+                  }
+                };
+                mutation.mutate({ ...value, notAlert: true });
+              }
+            }
+            if (tempSmsId) setData('smsId', tempSmsId)
+
+            // Check if we should continue fetching
+            if (arr.length === updatedSearch.maxCount) {
+              // There might be more messages, fetch next batch
+              getAllSMS(currentIndex + arr.length);
+            }
+            resolve();
+          }
+        );
+      });
+    } catch (error) {
+      console.error('Error fetching SMS:', error);
+    }
+  };
+
+  useEffect(() => {
+    // Request permissions on component mount
+    requestSMSPermission();
+
+    // Check for SMS every time the app comes to foreground
+    const subscription = AppState.addEventListener('change', (nextAppState) => {
+      if (nextAppState === 'active') {
+        getAllSMS(search.indexFrom);
+      }
+    });
+
+    return () => {
+      subscription.remove();
+    };
+  }, []);
+
 
   useEffect(() => {
     if (info?.fields) {
@@ -48,10 +168,6 @@ export default function Home() {
     }
   }, [data])
 
-  const mutation = useDeleteData((data: any) => {
-
-  });
-
   const renderComplaint = ({ item }: any) => (
     <HStack className='bg-background-light rounded-lg p-2 my-1 items-center'>
       <Box className="bg-[#FF000014] p-2 rounded-full flex justify-center items-center w-15 h-15">
@@ -65,20 +181,8 @@ export default function Home() {
     </HStack>
   );
 
-  const renderHiddenItem = ({ item }: any) => (
-    <View className='flex-1 flex-row items-center justify-end pl-4'>
-      <Pressable
-        className='flex bg-red-500 px-4 py-7 overflow-hidden rounded-tr-lg rounded-br-lg'
-        onPress={() => mutation.mutate({ doctype, ids: [item?.name] })}
-      >
-        <Text className='text-[15px] font-medium text-white'>Delete</Text>
-      </Pressable>
-    </View>
-  );
-
   return (
     <>
-      <SmsList />
       <MainWapper backgroundColor={'rgb(29, 191, 115)'} padding onRefresh={refetch} refreshing={isLoading}>
         <Box className='p-3 text-primary bg-primary rounded-b-[60px] pb-5'>
           <VStack className='justify-center items-center'>
@@ -99,7 +203,6 @@ export default function Home() {
         <Box className='m-2 pb-20'>
 
           <HStack className="content-center justify-between m-2">
-            <Heading className='m-2'>My Data</Heading>
             <HStack>
               <Text className='text-lg m-2'>CR: <Text className={'text-primary'}>{total?.credit}</Text></Text>
               <Text className='text-lg m-2'>DR: <Text className={'text-tertiary'}>{total?.debit}</Text></Text>
@@ -110,12 +213,16 @@ export default function Home() {
           <SwipeListView
             data={list}
             renderItem={renderComplaint}
-            // renderHiddenItem={renderHiddenItem}
             rightOpenValue={-75}
           />
+          <Pressable
+            className='bg-red-500 p-2 overflow-hidden rounded-lg my-5 mx-10'
+            onPress={() => navigation.navigate('account')}
+          >
+            <Text className='text-[15px] font-medium text-white'>Show More...</Text>
+          </Pressable>
         </Box>
       </MainWapper>
-      {/* <BottomTabs navigation={navigation} activeTab="Home" /> */}
     </>
   );
 }

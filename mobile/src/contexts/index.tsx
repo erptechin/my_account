@@ -72,7 +72,10 @@ export const MainProvider: FC<PropsWithChildren> = ({ children }) => {
         setToken(null);
         removeData('user');
         setUser(null);
-        DevSettings.reload();
+        removeData('smsId');
+        setTimeout(() => {
+            DevSettings.reload();
+        }, 100)
     }
 
     const handleToken = async (token: any) => {

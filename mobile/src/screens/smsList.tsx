@@ -21,7 +21,6 @@ export default function SmsList() {
     const bodyRegex = '.*(credited|debited|deposited|withdrawn|transaction|card|account|bank|upi|rs\\.?\\s?\\d+|inr\\s?\\d+|balance|payment|receive|send|imps|neft|rtgs|ref no|upi ref).*';
     const [search, setSearch] = useState<any>({ box: 'inbox', bodyRegex, indexFrom: 0, maxCount: 10 });
     const [hasPermission, setHasPermission] = useState(false);
-
     const mutation = useAddData((data: any) => {
 
     });
