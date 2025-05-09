@@ -14,21 +14,31 @@ import DynamicForms from 'app/components/form/dynamicForms';
 import { useInfo, useAddData, useFeachSingle, useUpdateData } from "hooks/useApiHook";
 
 const doctype = "Charge Entry"
-const fields = ['dob', 'driving_licence_no', 'filed_date', 'violator_first_name']
-const subFields = ['violator_last_name', 'offense_date']
+const fields = ['document_type', 'offense_date', 'filed_date', 'citation_number', 'time_of_violation_24_hrss']
+const fields_1 = ['violator_first_name', 'violator_middle_name', 'violator_last_name', 'defendant_suffix', 'street_address', 'street_address_line_2', 'vl_city', 'vl_state', 'zipcode_5', 'zipcode_4', 'vl_country', 'vl_mobile_no', 'email', 'social_security_number', 'dob', 'violator_age', 'race', 'defendant_gender', 'defendant_ethnicity', 'hair_color', 'height', 'eye_color', 'legacy_race']
+const fields_2 = ['driving_licence_no', 'dl_state', 'dl_class', 'is_licence_cdl']
+const fields_3 = ['make_year', 'vehicle_make', 'commercial', 'model', 'colour', 'licence_number', 'license_plate_state', 'vehicle_registration_year', 'vin']
+const fields_4 = ['inc_location_type', 'inc_street_address', 'inc_street_address_line_2', 'on_city', 'inc_state', 'inc_zip4', 'offence_code', 'witness_table']
+const fields_5 = ['notes']
+const subFields = ['is_the_defendant_out_on_bond', 'bond_type', 'bond_amount', 'bonding_company_agent', 'bonding_insurance_company_name', 'bond_number', 'was_bond_forfeitured_']
+
+const tableFields = {
+  "offence_code": { "violation_code": true, "docet": true, "violation_codes": true, "description": true },
+  "witness_table": { "offence_code": true, "name1": true, "docket": true }
+}
 
 // ----------------------------------------------------------------------
 
 const initialState = Object.fromEntries(
-  [...fields, ...subFields].map(field => [field, ""])
+  [...fields, ...fields_1, ...fields_2, ...fields_3, ...fields_4, ...fields_5, ...subFields].map(field => [field, ""])
 );
 
 export default function AddEditFrom() {
   const { isDark, darkColorScheme, lightColorScheme } = useThemeContext();
   const navigate = useNavigate();
   const { id } = useParams();
-  const { data: info, isFetching: isFetchingInfo } = useInfo({ doctype, fields: JSON.stringify([...fields, ...subFields]) });
-  const { data, isFetching: isFetchingData } = useFeachSingle({ doctype, id, fields: JSON.stringify([...fields, ...subFields]) });
+  const { data: info, isFetching: isFetchingInfo } = useInfo({ doctype, fields: JSON.stringify([...fields, ...fields_1, ...fields_2, ...fields_3, ...fields_4, ...fields_5, ...subFields]) });
+  const { data, isFetching: isFetchingData } = useFeachSingle({ doctype, id, fields: JSON.stringify([...fields, ...fields_1, ...fields_2, ...fields_3, ...fields_4, ...fields_5, ...subFields]) });
 
   const mutationAdd = useAddData((data) => {
     if (data) {
@@ -115,12 +125,53 @@ export default function AddEditFrom() {
                     control={control}
                     errors={errors}
                   />
+                  <h3><strong>Defendant Personal Details</strong></h3>
+                  <DynamicForms
+                    infos={info?.fields}
+                    fields={fields_1}
+                    register={register}
+                    control={control}
+                    errors={errors}
+                  />
+                  <h3><strong>Driver License Info</strong></h3>
+                  <DynamicForms
+                    infos={info?.fields}
+                    fields={fields_2}
+                    register={register}
+                    control={control}
+                    errors={errors}
+                  />
+                  <h3><strong>Vehicle Details</strong></h3>
+                  <DynamicForms
+                    infos={info?.fields}
+                    fields={fields_3}
+                    register={register}
+                    control={control}
+                    errors={errors}
+                  />
+                  <h3><strong>Incident Details</strong></h3>
+                  <DynamicForms
+                    infos={info?.fields}
+                    fields={fields_4}
+                    tables={tableFields}
+                    register={register}
+                    control={control}
+                    errors={errors}
+                  />
+                  <h3><strong>Notes</strong></h3>
+                  <DynamicForms
+                    infos={info?.fields}
+                    fields={fields_5}
+                    register={register}
+                    control={control}
+                    errors={errors}
+                  />
                 </div>
               </Card>
             </div>
             <div className="col-span-12 space-y-4 sm:space-y-5 lg:col-span-4 lg:space-y-6">
               <Card className="space-y-5 p-4 sm:px-5">
-
+                <h3><strong>Bond Details</strong></h3>
                 <DynamicForms
                   infos={info?.fields}
                   fields={subFields}

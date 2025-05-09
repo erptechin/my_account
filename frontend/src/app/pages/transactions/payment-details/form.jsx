@@ -13,9 +13,16 @@ import { Button, Card } from "components/ui";
 import DynamicForms from 'app/components/form/dynamicForms';
 import { useInfo, useAddData, useFeachSingle, useUpdateData } from "hooks/useApiHook";
 
+const pageName = "Payment Details"
 const doctype = "Fine Transaction"
-const fields = ['fine_amount', 'unpaid_amount', 'defendant_full_name']
-const subFields = ['legacy_balance_amount', 'offence_code', 'status']
+const fields = ['docet_id', 'date', 'reference_number', 'fine_amount', 'offence_code', 'unpaid_amount', 'offense_code_description', 'defendant_full_name', 'transaction_table', 'contempt_fee_table', 'component_table']
+const subFields = ['status']
+
+const tableFields = {
+  "transaction_table": { "date": true, "mode_of_payment": true, "payment_source": true, "amount": true },
+  "contempt_fee_table": { "component": true, "costs": true, "disbursed_amount": true },
+  "component_table": { "components": true, "costs": true, "fine_dispurse": true, "date": true }
+}
 
 // ----------------------------------------------------------------------
 
@@ -71,13 +78,13 @@ export default function AddEditFrom() {
     />
   }
   return (
-    <Page title={(id ? 'Edit ' : "New ") + doctype}>
+    <Page title={(id ? 'Edit ' : "New ") + pageName}>
       <div className="transition-content px-(--margin-x) pb-6">
         <div className="flex flex-col items-center justify-between space-y-4 py-5 sm:flex-row sm:space-y-0 lg:py-6">
           <div className="flex items-center gap-1">
             <DocumentPlusIcon className="size-6" />
             <h2 className="line-clamp-1 text-xl font-medium text-gray-700 dark:text-dark-50">
-              {id ? 'Edit' : "New"} {doctype}
+              {id ? 'Edit' : "New"} {pageName}
             </h2>
           </div>
           <div className="flex gap-2">
@@ -111,6 +118,7 @@ export default function AddEditFrom() {
                   <DynamicForms
                     infos={info?.fields}
                     fields={fields}
+                    tables={tableFields}
                     register={register}
                     control={control}
                     errors={errors}

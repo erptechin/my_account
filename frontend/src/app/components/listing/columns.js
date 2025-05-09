@@ -9,6 +9,8 @@ import {
 } from "components/shared/table/SelectCheckbox";
 import {
     OrderIdCell,
+    DateCell,
+    TotalCell,
     RoleCell
 } from "./rows";
 
@@ -35,6 +37,16 @@ export function Columns(fields = []) {
                 id: item.fieldname,
                 label: item.label,
                 header: item.label
+            }))
+        }
+
+        // Data
+        if (item.fieldtype == 'Currency') {
+            returnColumns.push(columnHelper.accessor((row) => row[item.fieldname], {
+                id: item.fieldname,
+                label: item.label,
+                header: item.label,
+                cell: TotalCell,
             }))
         }
 
@@ -78,6 +90,7 @@ export function Columns(fields = []) {
                 id: item.fieldname,
                 label: item.label,
                 header: item.label,
+                cell: DateCell,
             }))
         }
     }

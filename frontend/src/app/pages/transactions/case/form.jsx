@@ -13,22 +13,25 @@ import { Button, Card } from "components/ui";
 import DynamicForms from 'app/components/form/dynamicForms';
 import { useInfo, useAddData, useFeachSingle, useUpdateData } from "hooks/useApiHook";
 
+const pageName = "Case"
 const doctype = "Docket"
-const fields = ['description', 'dob', 'driving_licence_no']
-const subFields = ['full_name', 'offense_date']
+const fields = ['get_hearing_at_glance', 'case_title', 'case_status', 'modified_date']
+const fields_1 = ['full_name', 'dob', 'd_address', 'latest_hearing_date', 'hearing_time', 'offence_code', 'description', 'offense_date', 'citation_number', 'amended_charge']
+const fields_2 = ['fine_amount', 'court_cost', 'contempt_fee', 'total_fine', 'balance_amount']
+const subFields = ['bondamount', 'bond_number']
 
 // ----------------------------------------------------------------------
 
 const initialState = Object.fromEntries(
-  [...fields, ...subFields].map(field => [field, ""])
+  [...fields, ...fields_1, ...fields_2, ...subFields].map(field => [field, ""])
 );
 
 export default function AddEditFrom() {
   const { isDark, darkColorScheme, lightColorScheme } = useThemeContext();
   const navigate = useNavigate();
   const { id } = useParams();
-  const { data: info, isFetching: isFetchingInfo } = useInfo({ doctype, fields: JSON.stringify([...fields, ...subFields]) });
-  const { data, isFetching: isFetchingData } = useFeachSingle({ doctype, id, fields: JSON.stringify([...fields, ...subFields]) });
+  const { data: info, isFetching: isFetchingInfo } = useInfo({ doctype, fields: JSON.stringify([...fields, ...fields_1, ...fields_2, ...subFields]) });
+  const { data, isFetching: isFetchingData } = useFeachSingle({ doctype, id, fields: JSON.stringify([...fields, ...fields_1, ...fields_2, ...subFields]) });
 
   const mutationAdd = useAddData((data) => {
     if (data) {
@@ -71,13 +74,13 @@ export default function AddEditFrom() {
     />
   }
   return (
-    <Page title={(id ? 'Edit ' : "New ") + doctype}>
+    <Page title={(id ? 'Edit ' : "New ") + pageName}>
       <div className="transition-content px-(--margin-x) pb-6">
         <div className="flex flex-col items-center justify-between space-y-4 py-5 sm:flex-row sm:space-y-0 lg:py-6">
           <div className="flex items-center gap-1">
             <DocumentPlusIcon className="size-6" />
             <h2 className="line-clamp-1 text-xl font-medium text-gray-700 dark:text-dark-50">
-              {id ? 'Edit' : "New"} {doctype}
+              {id ? 'Edit' : "New"} {pageName}
             </h2>
           </div>
           <div className="flex gap-2">
@@ -89,14 +92,14 @@ export default function AddEditFrom() {
             >
               Back
             </Button>
-            <Button
+            {/* <Button
               className="min-w-[7rem]"
               color="primary"
               type="submit"
               form="new-post-form"
             >
               Save
-            </Button>
+            </Button> */}
           </div>
         </div>
         <form
@@ -115,12 +118,28 @@ export default function AddEditFrom() {
                     control={control}
                     errors={errors}
                   />
+                  <h3><strong>Driver License Info</strong></h3>
+                  <DynamicForms
+                    infos={info?.fields}
+                    fields={fields_1}
+                    register={register}
+                    control={control}
+                    errors={errors}
+                  />
+                  <h3><strong>Cost Details</strong></h3>
+                  <DynamicForms
+                    infos={info?.fields}
+                    fields={fields_2}
+                    register={register}
+                    control={control}
+                    errors={errors}
+                  />
                 </div>
               </Card>
             </div>
             <div className="col-span-12 space-y-4 sm:space-y-5 lg:col-span-4 lg:space-y-6">
               <Card className="space-y-5 p-4 sm:px-5">
-
+                <h3><strong>Bond Details</strong></h3>
                 <DynamicForms
                   infos={info?.fields}
                   fields={subFields}

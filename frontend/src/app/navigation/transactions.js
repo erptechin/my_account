@@ -38,5 +38,13 @@ export const transactions = {
             transKey: 'nav.transactions.payment-details',
             Icon: StatisticIcon,
         },
+        {
+            id: 'transactions.payment-plan',
+            path: path(ROOT_MASTERS, '/payment-plan'),
+            type: NAV_TYPE_ITEM,
+            title: 'Payment Plan',
+            transKey: 'nav.transactions.payment-plan',
+            Icon: StatisticIcon,
+        },
     ]
 }

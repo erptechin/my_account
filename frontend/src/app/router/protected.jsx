@@ -33,27 +33,6 @@ const protectedRoutes = {
                 Component: (await import("app/pages/dashboards/home")).default,
               }),
             },
-            {
-              path: "charge-entry",
-              lazy: async () => ({
-                Component: (await import("app/pages/dashboards/charge-entry"))
-                  .default,
-              }),
-            },
-            {
-              path: "charge-entry/add-new",
-              lazy: async () => ({
-                Component: (await import("app/pages/dashboards/charge-entry/form"))
-                  .default,
-              }),
-            },
-            {
-              path: "charge-entry/edit/:id",
-              lazy: async () => ({
-                Component: (await import("app/pages/dashboards/charge-entry/form"))
-                  .default,
-              }),
-            },
           ],
         },
         {
@@ -123,6 +102,27 @@ const protectedRoutes = {
               path: "payment-details/edit/:id",
               lazy: async () => ({
                 Component: (await import("app/pages/transactions/payment-details/form"))
+                  .default,
+              }),
+            },
+            {
+              path: "payment-plan",
+              lazy: async () => ({
+                Component: (await import("app/pages/transactions/payment-plan"))
+                  .default,
+              }),
+            },
+            {
+              path: "payment-plan/add-new",
+              lazy: async () => ({
+                Component: (await import("app/pages/transactions/payment-plan/form"))
+                  .default,
+              }),
+            },
+            {
+              path: "payment-plan/edit/:id",
+              lazy: async () => ({
+                Component: (await import("app/pages/transactions/payment-plan/form"))
                   .default,
               }),
             },

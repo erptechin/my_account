@@ -42,8 +42,9 @@ import { useInfo, useFeachData } from "hooks/useApiHook";
 
 const isSafari = getUserAgentBrowser() === "Safari";
 
+const pageName = "Case"
 const doctype = "Docket"
-const fields = ['description', 'dob', 'driving_licence_no', 'full_name', 'offense_date']
+const fields = ['dob', 'driving_licence_no', 'filed_date', 'violator_first_name', 'violator_last_name','offense_date']
 
 export default function ListData() {
   const { cardSkin } = useThemeContext();
@@ -150,12 +151,12 @@ export default function ListData() {
   useLockScrollbar(tableSettings.enableFullScreen);
 
   return (
-    <Page title={doctype}>
+    <Page title={pageName}>
       <div className="transition-content grid grid-cols-1 grid-rows-[auto_auto_1fr] px-(--margin-x) py-4">
         <div className="flex items-center justify-between space-x-4 ">
           <div className="min-w-0">
             <h2 className="truncate text-xl font-medium tracking-wide text-gray-800 dark:text-dark-50">
-              {doctype} Lists
+              {pageName} Lists
             </h2>
           </div>
           <Button
@@ -164,7 +165,7 @@ export default function ListData() {
             onClick={() => navigate('add-new')}
           >
             <PlusIcon className="size-5" />
-            <span>New {doctype}</span>
+            <span>New {pageName}</span>
           </Button>
         </div>
         <div

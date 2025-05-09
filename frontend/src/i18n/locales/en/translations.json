@@ -13,7 +13,8 @@
       "transactions": "Transactions",
       "charge-entry": "Charge Entry",
       "case": "Case",
-      "payment-details": "Payment Details"
+      "payment-details": "Payment Details",
+      "payment-plan": "Payment Plan"
     },
     "settings": {
       "settings": "Settings",
