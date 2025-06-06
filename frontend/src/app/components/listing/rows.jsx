@@ -14,7 +14,7 @@ import { toast } from "sonner";
 
 // Local Imports
 import { Highlight } from "components/shared/Highlight";
-import { Avatar, Badge, Tag } from "components/ui";
+import { Avatar, Badge, Tag, Circlebar } from "components/ui";
 import { useLocaleContext } from "app/contexts/locale/context";
 import { ensureString } from "utils/ensureString";
 import { orderStatusOptions } from "./orderStatusOptions";
@@ -75,6 +75,16 @@ export function CustomerCell({ row, getValue, column, table }) {
         <Highlight query={[globalQuery, columnQuery]}>{name}</Highlight>
       </span>
     </div>
+  );
+}
+
+export function ProgressCell({ getValue }) {
+  return (
+    <Circlebar size={15} color="primary" value={getValue()}>
+      <span className="text-sm font-sm text-primary-light dark:text-primary-100">
+        {getValue()}%
+      </span>
+    </Circlebar>
   );
 }
 
@@ -179,7 +189,7 @@ export function RoleCell({ getValue }) {
   const val = getValue();
   const option = statusOptions.find((item) => item.value === val);
   return (
-    <Badge color={option.color} variant="outlined">
+    <Badge color={option.color} variant="outlined" className="rounded-full">
       {option.label}
     </Badge>
   );
@@ -224,4 +234,8 @@ CustomerCell.propTypes = {
   column: PropTypes.object,
   table: PropTypes.object,
   getValue: PropTypes.func,
+};
+
+ProgressCell.propTypes = {
+  row: PropTypes.object.isRequired,
 };

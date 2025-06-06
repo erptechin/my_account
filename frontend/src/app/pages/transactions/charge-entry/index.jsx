@@ -43,7 +43,7 @@ import { useInfo, useFeachData } from "hooks/useApiHook";
 const isSafari = getUserAgentBrowser() === "Safari";
 
 const doctype = "Charge Entry"
-const fields = ['dob', 'driving_licence_no', 'filed_date', 'violator_first_name', 'violator_last_name', 'offense_date']
+const fields = ['dob', 'filed_date', 'violator_first_name', 'violator_last_name', 'offense_date']
 
 export default function ListData() {
   const { cardSkin } = useThemeContext();

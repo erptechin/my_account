@@ -14,7 +14,7 @@ import DynamicForms from 'app/components/form/dynamicForms';
 import { useInfo, useAddData, useFeachSingle, useUpdateData } from "hooks/useApiHook";
 
 const doctype = "Charge Entry"
-const fields = ['document_type', 'offense_date', 'filed_date', 'citation_number', 'time_of_violation_24_hrss']
+const fields = ['document_type', 'offense_date', 'filed_date', 'citation_number', 'time_of_violation_24_hrss', 'custom_aa']
 const fields_1 = ['violator_first_name', 'violator_middle_name', 'violator_last_name', 'defendant_suffix', 'street_address', 'street_address_line_2', 'vl_city', 'vl_state', 'zipcode_5', 'zipcode_4', 'vl_country', 'vl_mobile_no', 'email', 'social_security_number', 'dob', 'violator_age', 'race', 'defendant_gender', 'defendant_ethnicity', 'hair_color', 'height', 'eye_color', 'legacy_race']
 const fields_2 = ['driving_licence_no', 'dl_state', 'dl_class', 'is_licence_cdl']
 const fields_3 = ['make_year', 'vehicle_make', 'commercial', 'model', 'colour', 'licence_number', 'license_plate_state', 'vehicle_registration_year', 'vin']

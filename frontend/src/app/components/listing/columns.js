@@ -11,8 +11,10 @@ import {
     OrderIdCell,
     DateCell,
     TotalCell,
+    ProgressCell,
     RoleCell
 } from "./rows";
+
 
 // ----------------------------------------------------------------------
 
@@ -30,6 +32,16 @@ export function Columns(fields = []) {
     }))
 
     for (let item of fields) {
+
+        // Data
+        if (item.fieldtype == 'Progress') {
+            returnColumns.push(columnHelper.accessor((row) => row[item.fieldname], {
+                id: item.fieldname,
+                label: item.label,
+                header: item.label,
+                cell: ProgressCell
+            }))
+        }
 
         // Data
         if (item.fieldtype == 'Data') {

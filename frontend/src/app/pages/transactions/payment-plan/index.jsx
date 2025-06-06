@@ -44,7 +44,7 @@ const isSafari = getUserAgentBrowser() === "Safari";
 
 const pageName = "Payment Plan"
 const doctype = "Payment Plan"
-const fields = ['current_balance', 'dob', 'defendant_first_name', 'defendant_last_name', 'previous_payment_date', 'payment_status']
+const fields = ['current_balance', 'total_amount', 'dob', 'defendant_first_name', 'defendant_last_name', 'previous_payment_date', 'payment_status']
 
 export default function ListData() {
   const { cardSkin } = useThemeContext();
@@ -65,7 +65,14 @@ export default function ListData() {
 
   useEffect(() => {
     if (data?.data) {
-      setOrders(data?.data)
+      const updatedData = data.data.map(row => {
+        const progress = row ? (row.current_balance / row.total_amount * 100) || 0 : 0;
+        return {
+          ...row,
+          progress: progress.toFixed(0)
+        };
+      });
+      setOrders(updatedData);
     }
   }, [data])
 
@@ -96,7 +103,7 @@ export default function ListData() {
 
   const table = useReactTable({
     data: orders,
-    columns: Columns(info?.fields),
+    columns: Columns(info && info.fields ? [...info.fields, { fieldtype: 'Progress', label: 'Progress', fieldname: 'progress' }] : []),
     doctype,
     state: {
       globalFilter,

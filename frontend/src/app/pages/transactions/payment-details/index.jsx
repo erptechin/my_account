@@ -59,13 +59,23 @@ export default function ListData() {
   useEffect(() => {
     if (info?.fields) {
       const fieldnames = info?.fields.map(field => field.fieldname);
-      setSearch({ ...search, fields: JSON.stringify([...fieldnames, "name"]) })
+      setSearch(prevSearch => ({ 
+        ...prevSearch, 
+        fields: JSON.stringify([...fieldnames, "name"]) 
+      }));
     }
   }, [info])
 
   useEffect(() => {
     if (data?.data) {
-      setOrders(data?.data)
+      const updatedData = data.data.map(row => {
+        const progress = row ? (row.unpaid_amount / row.fine_amount * 100) || 0 : 0;
+        return {
+          ...row,
+          progress: progress.toFixed(0)
+        };
+      });
+      setOrders(updatedData);
     }
   }, [data])
 
@@ -96,7 +106,7 @@ export default function ListData() {
 
   const table = useReactTable({
     data: orders,
-    columns: Columns(info?.fields),
+    columns: Columns(info && info.fields ? [...info.fields, { fieldtype: 'Progress', label: 'Progress', fieldname: 'progress' }] : []),
     doctype,
     state: {
       globalFilter,

@@ -9,7 +9,7 @@ import { DocumentPlusIcon } from "@heroicons/react/24/outline";
 // Local Imports
 import { Schema } from "app/components/form/schema";
 import { Page } from "components/shared/Page";
-import { Button, Card } from "components/ui";
+import { Button, Card, Progress } from "components/ui";
 import DynamicForms from 'app/components/form/dynamicForms';
 import { useInfo, useAddData, useFeachSingle, useUpdateData } from "hooks/useApiHook";
 
@@ -106,6 +106,12 @@ export default function AddEditFrom() {
             </Button>
           </div>
         </div>
+        <div className="py-5">
+          <Progress 
+            color="success" 
+            value={data ? (data.unpaid_amount / data.fine_amount * 100) || 0 : 0} 
+          />
+        </div>
         <form
           autoComplete="off"
           onSubmit={handleSubmit(onSubmit)}
@@ -128,7 +134,6 @@ export default function AddEditFrom() {
             </div>
             <div className="col-span-12 space-y-4 sm:space-y-5 lg:col-span-4 lg:space-y-6">
               <Card className="space-y-5 p-4 sm:px-5">
-
                 <DynamicForms
                   infos={info?.fields}
                   fields={subFields}
