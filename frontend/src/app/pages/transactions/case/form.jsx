@@ -1,4 +1,5 @@
 // Import Dependencies
+import { useState, useEffect } from "react";
 import { useNavigate, useParams } from "react-router";
 import { Skeleton } from "components/ui";
 import { useThemeContext } from "app/contexts/theme/context";
@@ -15,23 +16,28 @@ import { useInfo, useAddData, useFeachSingle, useUpdateData } from "hooks/useApi
 
 const pageName = "Case"
 const doctype = "Docket"
-const fields = ['get_hearing_at_glance', 'case_title', 'case_status', 'modified_date']
-const fields_1 = ['full_name', 'dob', 'd_address', 'latest_hearing_date', 'hearing_time', 'offence_code', 'description', 'offense_date', 'citation_number', 'amended_charge']
-const fields_2 = ['fine_amount', 'court_cost', 'contempt_fee', 'total_fine', 'balance_amount']
-const subFields = ['bondamount', 'bond_number']
+
+const section_lists = ['section_break_n4h60', 'section_break_wbii', 'section_break_3gpim', 'section_break_qwmbq', 'bond_details_section', 'section_break_7h1go', 'get_hearing_at_glance', 'column_break_z8a1a', 'column_break_qewps', 'column_break_drnys', 'column_break_dmer3', 'column_break_tsesv', 'column_break_egal', 'column_break_eakzy']
+const field_lists = [ 'case_title', 'case_status', 'modified_date', 'full_name', 'dob', 'd_address', 'latest_hearing_date', 'hearing_time', 'offence_code', 'description', 'offense_date', 'citation_number', 'amended_charge', 'fine_amount', 'court_cost', 'contempt_fee', 'total_fine', 'balance_amount', 'bondamount', 'bond_number']
 
 // ----------------------------------------------------------------------
-
-const initialState = Object.fromEntries(
-  [...fields, ...fields_1, ...fields_2, ...subFields].map(field => [field, ""])
-);
 
 export default function AddEditFrom() {
   const { isDark, darkColorScheme, lightColorScheme } = useThemeContext();
   const navigate = useNavigate();
   const { id } = useParams();
-  const { data: info, isFetching: isFetchingInfo } = useInfo({ doctype, fields: JSON.stringify([...fields, ...fields_1, ...fields_2, ...subFields]) });
-  const { data, isFetching: isFetchingData } = useFeachSingle({ doctype, id, fields: JSON.stringify([...fields, ...fields_1, ...fields_2, ...subFields]) });
+  const [fields, setFields] = useState(null)
+  const [initialState, setInitialState] = useState({})
+  const { data: info, isFetching: isFetchingInfo } = useInfo({ doctype, fields: JSON.stringify([...section_lists, ...field_lists]) });
+  const { data, isFetching: isFetchingData } = useFeachSingle({ doctype, id, fields: fields ? JSON.stringify(fields) : null });
+
+  useEffect(() => {
+    if (info?.fields) {
+      let fields = info?.fields.map(item => item.fieldname)
+      setFields(fields)
+      setInitialState(Object.fromEntries(fields.map(field => [field, ""])))
+    }
+  }, [info?.fields])
 
   const mutationAdd = useAddData((data) => {
     if (data) {
@@ -107,7 +113,13 @@ export default function AddEditFrom() {
           onSubmit={handleSubmit(onSubmit)}
           id="new-post-form"
         >
-          <div className="grid grid-cols-12 place-content-start gap-4 sm:gap-5 lg:gap-6">
+          <DynamicForms
+            infos={info?.fields}
+            register={register}
+            control={control}
+            errors={errors}
+          />
+          {/* <div className="grid grid-cols-12 place-content-start gap-4 sm:gap-5 lg:gap-6">
             <div className="col-span-12 lg:col-span-8">
               <Card className="p-4 sm:px-5">
                 <div className="mt-5 space-y-5">
@@ -149,7 +161,7 @@ export default function AddEditFrom() {
                 />
               </Card>
             </div>
-          </div>
+          </div> */}
         </form>
       </div>
     </Page>

@@ -32,7 +32,7 @@ export const useFeachSingle = (params) => {
     return useQuery({
         queryKey: [dataKey(params.doctype), params],
         queryFn: () => getSingleData(params),
-        enabled: isAuthenticated && !!params.id,
+        enabled: isAuthenticated && !!params.id && !!params?.fields,
         select: (data) => {
             let newData = { ...data, ...data?.location }
             delete newData.location

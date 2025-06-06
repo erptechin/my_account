@@ -103,31 +103,6 @@ const TableBox = forwardRef(({ onChange, values, label, rootItem, tableFields, e
 
   // Add getDisplayValue helper function
   const getDisplayValue = (item, fieldName) => {
-    if (!item[fieldName]) return '';
-
-    if (typeof tableFields[fieldName] === 'boolean') {
-      return item[fieldName].toString();
-    }
-
-    if (fieldName === 'image') {
-      return <img className="h-8 w-8 rounded" src={JWT_HOST_API + item[fieldName]} alt="thumbnail" />;
-    }
-
-    if (fieldName === 'color') {
-      return (
-        <div className="badge-base" style={{ background: item[fieldName], width: '50px', height: '20px', borderRadius: '4px' }} />
-      );
-    }
-
-    if (typeof tableFields[fieldName] === 'object') {
-      const selItem = listData[fieldName] ? listData[fieldName].find((list) => list.name === item[fieldName]) : null;
-      if (!selItem) return item[fieldName];
-      return Object.values(tableFields[fieldName])
-        .map(key => selItem[key])
-        .filter(Boolean)
-        .join(' - ');
-    }
-
     return item[fieldName];
   };
 
@@ -140,7 +115,7 @@ const TableBox = forwardRef(({ onChange, values, label, rootItem, tableFields, e
         </div>
 
         <div className="relative mt-1.5">
-          <div className="hide-scrollbar min-w-full overflow-x-auto">
+          <div className="hide-scrollbar w-full max-w-[300px] sm:max-w-[400px] md:max-w-full overflow-x-auto overflow-y-hidden scroll-smooth">
             <Table hoverable className="w-full text-left rtl:text-right">
               <THead>
                 <Tr>

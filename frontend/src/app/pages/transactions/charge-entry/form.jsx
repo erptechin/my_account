@@ -1,4 +1,5 @@
 // Import Dependencies
+import { useState, useEffect } from "react";
 import { useNavigate, useParams } from "react-router";
 import { Skeleton } from "components/ui";
 import { useThemeContext } from "app/contexts/theme/context";
@@ -14,13 +15,6 @@ import DynamicForms from 'app/components/form/dynamicForms';
 import { useInfo, useAddData, useFeachSingle, useUpdateData } from "hooks/useApiHook";
 
 const doctype = "Charge Entry"
-const fields = ['document_type', 'offense_date', 'filed_date', 'citation_number', 'time_of_violation_24_hrss', 'custom_aa']
-const fields_1 = ['violator_first_name', 'violator_middle_name', 'violator_last_name', 'defendant_suffix', 'street_address', 'street_address_line_2', 'vl_city', 'vl_state', 'zipcode_5', 'zipcode_4', 'vl_country', 'vl_mobile_no', 'email', 'social_security_number', 'dob', 'violator_age', 'race', 'defendant_gender', 'defendant_ethnicity', 'hair_color', 'height', 'eye_color', 'legacy_race']
-const fields_2 = ['driving_licence_no', 'dl_state', 'dl_class', 'is_licence_cdl']
-const fields_3 = ['make_year', 'vehicle_make', 'commercial', 'model', 'colour', 'licence_number', 'license_plate_state', 'vehicle_registration_year', 'vin']
-const fields_4 = ['inc_location_type', 'inc_street_address', 'inc_street_address_line_2', 'on_city', 'inc_state', 'inc_zip4', 'offence_code', 'witness_table']
-const fields_5 = ['notes']
-const subFields = ['is_the_defendant_out_on_bond', 'bond_type', 'bond_amount', 'bonding_company_agent', 'bonding_insurance_company_name', 'bond_number', 'was_bond_forfeitured_']
 
 const tableFields = {
   "offence_code": { "violation_code": true, "docet": true, "violation_codes": true, "description": true },
@@ -29,17 +23,25 @@ const tableFields = {
 
 // ----------------------------------------------------------------------
 
-const initialState = Object.fromEntries(
-  [...fields, ...fields_1, ...fields_2, ...fields_3, ...fields_4, ...fields_5, ...subFields].map(field => [field, ""])
-);
+
 
 export default function AddEditFrom() {
   const { isDark, darkColorScheme, lightColorScheme } = useThemeContext();
   const navigate = useNavigate();
   const { id } = useParams();
-  const { data: info, isFetching: isFetchingInfo } = useInfo({ doctype, fields: JSON.stringify([...fields, ...fields_1, ...fields_2, ...fields_3, ...fields_4, ...fields_5, ...subFields]) });
-  const { data, isFetching: isFetchingData } = useFeachSingle({ doctype, id, fields: JSON.stringify([...fields, ...fields_1, ...fields_2, ...fields_3, ...fields_4, ...fields_5, ...subFields]) });
+  const [fields, setFields] = useState(null)
+  const [initialState, setInitialState] = useState({})
+  const { data: info, isFetching: isFetchingInfo } = useInfo({ doctype });
+  const { data, isFetching: isFetchingData } = useFeachSingle({ doctype, id, fields: fields ? JSON.stringify(fields) : null });
 
+  useEffect(() => {
+    if (info?.fields) {
+      let fields = info?.fields.map(item => item.fieldname)
+      setFields(fields)
+      setInitialState(Object.fromEntries(fields.map(field => [field, ""])))
+    }
+  }, [info?.fields])
+  
   const mutationAdd = useAddData((data) => {
     if (data) {
       reset();
@@ -114,7 +116,14 @@ export default function AddEditFrom() {
           onSubmit={handleSubmit(onSubmit)}
           id="new-post-form"
         >
-          <div className="grid grid-cols-12 place-content-start gap-4 sm:gap-5 lg:gap-6">
+          <DynamicForms
+                    infos={info?.fields}
+                    tables={tableFields}
+                    register={register}
+                    control={control}
+                    errors={errors}
+                  />
+          {/* <div className="grid grid-cols-12 place-content-start gap-4 sm:gap-5 lg:gap-6">
             <div className="col-span-12 lg:col-span-8">
               <Card className="p-4 sm:px-5">
                 <div className="mt-5 space-y-5">
@@ -181,7 +190,7 @@ export default function AddEditFrom() {
                 />
               </Card>
             </div>
-          </div>
+          </div> */}
         </form>
       </div>
     </Page>

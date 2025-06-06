@@ -1,4 +1,5 @@
 // Import Dependencies
+import { useState, useEffect } from "react";
 import { useNavigate, useParams } from "react-router";
 import { Skeleton } from "components/ui";
 import { useThemeContext } from "app/contexts/theme/context";
@@ -15,8 +16,6 @@ import { useInfo, useAddData, useFeachSingle, useUpdateData } from "hooks/useApi
 
 const pageName = "Payment Details"
 const doctype = "Fine Transaction"
-const fields = ['docet_id', 'date', 'reference_number', 'fine_amount', 'offence_code', 'unpaid_amount', 'offense_code_description', 'defendant_full_name', 'transaction_table', 'contempt_fee_table', 'component_table']
-const subFields = ['status']
 
 const tableFields = {
   "transaction_table": { "date": true, "mode_of_payment": true, "payment_source": true, "amount": true },
@@ -26,16 +25,22 @@ const tableFields = {
 
 // ----------------------------------------------------------------------
 
-const initialState = Object.fromEntries(
-  [...fields, ...subFields].map(field => [field, ""])
-);
-
 export default function AddEditFrom() {
   const { isDark, darkColorScheme, lightColorScheme } = useThemeContext();
   const navigate = useNavigate();
   const { id } = useParams();
-  const { data: info, isFetching: isFetchingInfo } = useInfo({ doctype, fields: JSON.stringify([...fields, ...subFields]) });
-  const { data, isFetching: isFetchingData } = useFeachSingle({ doctype, id, fields: JSON.stringify([...fields, ...subFields]) });
+  const [fields, setFields] = useState(null)
+  const [initialState, setInitialState] = useState({})
+  const { data: info, isFetching: isFetchingInfo } = useInfo({ doctype });
+  const { data, isFetching: isFetchingData } = useFeachSingle({ doctype, id, fields: fields ? JSON.stringify(fields) : null });
+
+  useEffect(() => {
+    if (info?.fields) {
+      let fields = info?.fields.map(item => item.fieldname)
+      setFields(fields)
+      setInitialState(Object.fromEntries(fields.map(field => [field, ""])))
+    }
+  }, [info?.fields])
 
   const mutationAdd = useAddData((data) => {
     if (data) {
@@ -107,9 +112,9 @@ export default function AddEditFrom() {
           </div>
         </div>
         <div className="py-5">
-          <Progress 
-            color="success" 
-            value={data ? (data.unpaid_amount / data.fine_amount * 100) || 0 : 0} 
+          <Progress
+            color="success"
+            value={data ? (data.unpaid_amount / data.fine_amount * 100) || 0 : 0}
           />
         </div>
         <form
@@ -117,7 +122,14 @@ export default function AddEditFrom() {
           onSubmit={handleSubmit(onSubmit)}
           id="new-post-form"
         >
-          <div className="grid grid-cols-12 place-content-start gap-4 sm:gap-5 lg:gap-6">
+          <DynamicForms
+            infos={info?.fields}
+            tables={tableFields}
+            register={register}
+            control={control}
+            errors={errors}
+          />
+          {/* <div className="grid grid-cols-12 place-content-start gap-4 sm:gap-5 lg:gap-6">
             <div className="col-span-12 lg:col-span-8">
               <Card className="p-4 sm:px-5">
                 <div className="mt-5 space-y-5">
@@ -143,7 +155,7 @@ export default function AddEditFrom() {
                 />
               </Card>
             </div>
-          </div>
+          </div> */}
         </form>
       </div>
     </Page>

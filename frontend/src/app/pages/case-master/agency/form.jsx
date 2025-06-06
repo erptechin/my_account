@@ -104,7 +104,14 @@ export default function AddEditFrom() {
           onSubmit={handleSubmit(onSubmit)}
           id="new-post-form"
         >
-          <div className="grid grid-cols-12 place-content-start gap-4 sm:gap-5 lg:gap-6">
+          <DynamicForms
+            infos={info?.fields}
+            fields={subFields}
+            register={register}
+            control={control}
+            errors={errors}
+          />
+          {/* <div className="grid grid-cols-12 place-content-start gap-4 sm:gap-5 lg:gap-6">
             <div className="col-span-12 lg:col-span-8">
               <Card className="p-4 sm:px-5">
                 <div className="mt-5 space-y-5">
@@ -130,7 +137,7 @@ export default function AddEditFrom() {
                 />
               </Card>
             </div>
-          </div>
+          </div> */}
         </form>
       </div>
     </Page>
