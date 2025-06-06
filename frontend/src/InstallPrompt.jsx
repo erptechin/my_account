@@ -2,7 +2,7 @@ import { useEffect, useState } from 'react';
 
 export default function InstallPrompt() {
     const [deferredPrompt, setDeferredPrompt] = useState(null);
-    const [showButton, setShowButton] = useState(true);
+    const [showButton, setShowButton] = useState(false);
 
     useEffect(() => {
         const handler = (e) => {
